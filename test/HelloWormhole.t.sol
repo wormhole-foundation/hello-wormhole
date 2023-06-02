@@ -30,7 +30,7 @@ contract SavingsAccountTest is Test {
         helloB = new HelloWormhole(_relayer);
     }
 
-    function testNative() public {
+    function testGreeting() public {
         uint256 cost = helloA.quoteGreeting(targetChain);
 
         helloA.sendGreeting{value: cost}(
