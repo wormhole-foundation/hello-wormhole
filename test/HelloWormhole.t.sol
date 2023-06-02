@@ -46,6 +46,8 @@ contract SavingsAccountTest is Test {
             address(helloA)
         );
         _mockRelayer.performRecordedDeliveries();
+
+        assertEq(helloB.greetings(0), "Hello Wormhole!");
     }
 
     receive() external payable {}
