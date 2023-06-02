@@ -7,7 +7,7 @@ import "../src/HelloWormhole.sol";
 import "./MockWormholeRelayer.sol";
 import "../src/interfaces/IWormholeRelayer.sol";
 
-contract SavingsAccountTest is Test {
+contract HelloWormholeTest is Test {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
     IWormholeRelayer relayer;
     MockWormholeRelayer _mockRelayer;
@@ -21,8 +21,7 @@ contract SavingsAccountTest is Test {
         // set up Mock Wormhole Relayer
         _mockRelayer = new MockWormholeRelayer();
         address _relayer = address(_mockRelayer);
-        (bool success, ) = _relayer.call{value: 100e18}("");
-        require(success);
+        payable(_relayer).transfer(100e18);
         relayer = IWormholeRelayer(_relayer);
 
         // set up HelloWormhole contracts

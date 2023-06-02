@@ -7,7 +7,7 @@ import "./interfaces/IWormholeReceiver.sol";
 contract HelloWormhole is IWormholeReceiver {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
 
-    uint256 constant GAS_REQUIRED = 50_000;
+    uint256 constant GAS_LIMIT = 50_000;
     
     IWormholeRelayer public immutable wormholeRelayer;
 
@@ -23,7 +23,7 @@ contract HelloWormhole is IWormholeReceiver {
         (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
             targetChain,
             0,
-            GAS_REQUIRED
+            GAS_LIMIT
         );
     }
 
@@ -36,14 +36,14 @@ contract HelloWormhole is IWormholeReceiver {
         (uint256 cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
             targetChain,
             0,
-            GAS_REQUIRED
+            GAS_LIMIT
         );
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             targetChain,
             targetAddress,
             payload,
-            0, // no receiver value needed
-            GAS_REQUIRED
+            0, // no receiver value needed since we're just passing a message
+            GAS_LIMIT
         );
         if (msg.value > cost) {
             (bool success, ) = msg.sender.call{value: msg.value - cost}("");
