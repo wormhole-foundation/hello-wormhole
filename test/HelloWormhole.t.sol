@@ -8,7 +8,7 @@ import "./MockWormholeRelayer.sol";
 import "../src/interfaces/IWormholeRelayer.sol";
 
 contract SavingsAccountTest is Test {
-    event MessageReceived(string greeting, uint16 senderChain, address sender);
+    event GreetingReceived(string greeting, uint16 senderChain, address sender);
     IWormholeRelayer relayer;
     MockWormholeRelayer _mockRelayer;
 
@@ -31,11 +31,7 @@ contract SavingsAccountTest is Test {
     }
 
     function testNative() public {
-        (uint256 cost, ) = relayer.quoteEVMDeliveryPrice(
-            targetChain,
-            0,
-            30_000
-        );
+        uint256 cost = helloA.quoteGreeting(targetChain);
 
         helloA.sendGreeting{value: cost}(
             targetChain,
@@ -44,7 +40,7 @@ contract SavingsAccountTest is Test {
         );
 
         vm.expectEmit();
-        emit MessageReceived(
+        emit GreetingReceived(
             "Hello Wormhole!",
             _mockRelayer.chainId(),
             address(helloA)

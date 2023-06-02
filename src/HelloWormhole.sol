@@ -7,10 +7,22 @@ import "./interfaces/IWormholeReceiver.sol";
 contract HelloWormhole is IWormholeReceiver {
     IWormholeRelayer public immutable wormholeRelayer;
 
-    event MessageReceived(string greeting, uint16 senderChain, address sender);
+    event GreetingReceived(string greeting, uint16 senderChain, address sender);
+    string[] public greetings;
 
     constructor(address _wormholeRelayer) {
         wormholeRelayer = IWormholeRelayer(_wormholeRelayer);
+    }
+
+    function quoteGreeting(
+        uint16 targetChain
+    ) public view returns (uint256 cost) {
+        uint256 gasRequired = 50_000;
+        (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
+            targetChain,
+            0,
+            gasRequired
+        );
     }
 
     function sendGreeting(
@@ -19,7 +31,7 @@ contract HelloWormhole is IWormholeReceiver {
         string memory greeting
     ) public payable {
         bytes memory payload = abi.encode(greeting);
-        uint256 gasRequired = 30_000;
+        uint256 gasRequired = 50_000;
         (uint256 cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
             targetChain,
             0,
@@ -48,7 +60,8 @@ contract HelloWormhole is IWormholeReceiver {
         address sender = fromWormholeFormat(sourceAddress);
         string memory greeting = abi.decode(payload, (string));
 
-        emit MessageReceived(greeting, sourceChain, sender);
+        emit GreetingReceived(greeting, sourceChain, sender);
+        greetings.push(greeting);
     }
 }
 
