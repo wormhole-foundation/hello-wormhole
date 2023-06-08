@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 import "../src/HelloWormhole.sol";
-import "./MockWormholeRelayer.sol";
+import "./mocks/MockWormholeRelayer.sol";
 import "../src/interfaces/IWormholeRelayer.sol";
 
 contract HelloWormholeTest is Test {

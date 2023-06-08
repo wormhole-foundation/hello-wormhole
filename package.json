@@ -1,0 +1,26 @@
+{
+  "name": "hello-wormhole",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:JoeHowarth/hello-wormhole.git",
+  "author": "Joe Howarth <josephehowarth@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "main": "ts-node ./ts-scripts/main.ts",
+    "deploy": "ts-node ./ts-scripts/deploy.ts",
+    "build": "forge build; yarn typechain",
+    "typechain": "typechain --target ethers-v5 --out-dir ./ts-scripts/ethers-contracts ./out/**/*.json"
+  },
+  "dependencies": {
+    "@certusone/wormhole-sdk": "^0.9.18",
+    "@improbable-eng/grpc-web-node-http-transport": "^0.15.0",
+    "@typechain/ethers-v5": "^11.0.0",
+    "ethers": "^5",
+    "ts-node": "^10.9.1",
+    "typechain": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.5",
+    "typescript": "^5.1.3"
+  }
+}

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "../src/interfaces/IWormholeRelayer.sol";
-import "../src/interfaces/IWormholeReceiver.sol";
+import "../../src/interfaces/IWormholeRelayer.sol";
+import "../../src/interfaces/IWormholeReceiver.sol";
 
 // contract MockWormholeRelayer is IWormholeRelayer {
 contract MockWormholeRelayer {
@@ -89,6 +89,35 @@ contract MockWormholeRelayer {
         return sequence_++;
     }
 
+    // function sendVaasToEvm(
+    //     uint16 targetChain,
+    //     address targetAddress,
+    //     bytes memory payload,
+    //     uint256 receiverValue,
+    //     uint256 gasLimit,
+    //     VaaKey[] memory vaaKeys
+    // ) external payable returns (uint64 sequence) {
+    //     pendingDeliveries.push(
+    //         PackedDelivery({
+    //             targetChain: targetChain,
+    //             targetAddress: targetAddress,
+    //             receiverValue: receiverValue,
+    //             gasLimit: gasLimit,
+    //             payload: payload,
+    //             additionalVaas: vaaKeys,
+    //             sourceAddress: toWormholeFormat(msg.sender),
+    //             sourceChain: chainId,
+    //             deliveryHash: bytes32(0)
+    //         })
+    //     );
+    //     // not the real calculation, but good enough for testing
+    //     pendingDeliveries[pendingDeliveries.length - 1]
+    //         .deliveryHash = keccak256(
+    //         abi.encode(pendingDeliveries[pendingDeliveries.length - 1])
+    //     );
+    //     return sequence_++;
+    // }
+
     function quoteEVMDeliveryPrice(
         uint16, // targetChain,
         uint256 receiverValue,
@@ -149,17 +178,6 @@ contract MockWormholeRelayer {
     //     uint16 refundChain,
     //     address refundAddress
     // ) external payable override returns (uint64 sequence) {
-    //     revert("Not Implemented");
-    // }
-
-    // function sendVaasToEvm(
-    //     uint16 targetChain,
-    //     address targetAddress,
-    //     bytes memory payload,
-    //     uint256 receiverValue,
-    //     uint256 gasLimit,
-    //     VaaKey[] memory vaaKeys
-    // ) external payable returns (uint64 sequence) {
     //     revert("Not Implemented");
     // }
 
