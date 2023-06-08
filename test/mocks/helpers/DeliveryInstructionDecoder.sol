@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "../../src/interfaces/IWormholeRelayer.sol";
-import "../../lib/BytesParsing.sol";
+import "../../../src/interfaces/IWormholeRelayer.sol";
+import "./BytesParsing.sol";
 
 import "forge-std/console.sol";
 
@@ -30,7 +30,7 @@ struct DeliveryInstruction {
 
 function decodeDeliveryInstruction(
     bytes memory encoded
-) view returns (DeliveryInstruction memory strct) {
+) pure returns (DeliveryInstruction memory strct) {
     uint256 offset = checkUint8(encoded, 0, PAYLOAD_ID_DELIVERY_INSTRUCTION);
 
     uint256 requestedReceiverValue;
@@ -114,12 +114,10 @@ function encodeBytes(bytes memory payload) pure returns (bytes memory encoded) {
 function decodeBytes(
     bytes memory encoded,
     uint256 startOffset
-) view returns (bytes memory payload, uint256 offset) {
+) pure returns (bytes memory payload, uint256 offset) {
     uint32 payloadLength;
     (payloadLength, offset) = encoded.asUint32Unchecked(startOffset);
-    console.log("payload length: %d", payloadLength);
     (payload, offset) = encoded.sliceUnchecked(offset, payloadLength);
-    console.log("done with paylaod" );
 }
 
 function checkUint8(

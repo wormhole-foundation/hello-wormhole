@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache 2
 pragma solidity ^0.8.13;
 
-import {IWormhole} from "../../src/interfaces/IWormhole.sol";
+import {IWormhole} from "../../../src/interfaces/IWormhole.sol";
 import "./BytesLib.sol";
 
 import "forge-std/Vm.sol";
@@ -194,9 +194,8 @@ contract WormholeSimulator {
      */
     function fetchSignedMessageFromLogs(
         Vm.Log memory log,
-        uint16 emitterChainId,
-        address emitterAddress
-    ) public returns (bytes memory signedMessage) {
+        uint16 emitterChainId
+    ) public view returns (bytes memory signedMessage) {
         // Create message instance
         IWormhole.VM memory vm_;
 
@@ -207,7 +206,6 @@ contract WormholeSimulator {
         vm_.version = uint8(1);
         vm_.timestamp = uint32(block.timestamp);
         vm_.emitterChainId = emitterChainId;
-        vm_.emitterAddress = bytes32(uint256(uint160(emitterAddress)));
 
         return encodeAndSignMessage(vm_);
     }
@@ -223,7 +221,7 @@ contract WormholeSimulator {
         uint32 nonce,
         uint16 emitterChainId,
         address emitterAddress
-    ) public returns (bytes memory signedMessage) {
+    ) public view returns (bytes memory signedMessage) {
         uint8 numObservations = 0;
         IWormhole.VM[] memory vm_ = new IWormhole.VM[](logs.length);
 
@@ -297,7 +295,7 @@ contract WormholeSimulator {
      */
     function encodeAndSignMessage(
         IWormhole.VM memory vm_
-    ) public returns (bytes memory signedMessage) {
+    ) public view returns (bytes memory signedMessage) {
         // Compute the hash of the body
         bytes memory body = encodeObservation(vm_);
         vm_.hash = doubleKeccak256(body);
