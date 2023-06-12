@@ -30,9 +30,9 @@ contract HelloWormholeTest is Test {
     }
 
     function testGreeting() public {
-        uint256 cost = helloA.quoteGreeting(targetChain);
+        uint256 cost = helloA.quoteCrossChainGreeting(targetChain);
 
-        helloA.sendGreeting{value: cost}(
+        helloA.sendCrossChainGreeting{value: cost}(
             targetChain,
             address(helloB),
             "Hello Wormhole!"

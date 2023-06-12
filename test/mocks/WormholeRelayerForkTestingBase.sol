@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "../../src/HelloWormhole.sol";
 import "../../src/interfaces/IWormholeRelayer.sol";
 import "../../src/interfaces/IWormhole.sol";
 import "../../src/interfaces/ITokenBridge.sol";

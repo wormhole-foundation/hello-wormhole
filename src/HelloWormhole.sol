@@ -8,7 +8,7 @@ contract HelloWormhole is IWormholeReceiver {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
 
     uint256 constant GAS_LIMIT = 50_000;
-    
+
     IWormholeRelayer public immutable wormholeRelayer;
 
     string[] public greetings;
@@ -17,7 +17,7 @@ contract HelloWormhole is IWormholeReceiver {
         wormholeRelayer = IWormholeRelayer(_wormholeRelayer);
     }
 
-    function quoteGreeting(
+    function quoteCrossChainGreeting(
         uint16 targetChain
     ) public view returns (uint256 cost) {
         (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
@@ -27,24 +27,21 @@ contract HelloWormhole is IWormholeReceiver {
         );
     }
 
-    function sendGreeting(
+    function sendCrossChainGreeting(
         uint16 targetChain,
         address targetAddress,
         string memory greeting
     ) public payable {
-        bytes memory payload = abi.encode(greeting);
-        (uint256 cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
-            targetChain,
-            0,
-            GAS_LIMIT
-        );
+        uint256 cost = quoteCrossChainGreeting(targetChain);
+
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             targetChain,
             targetAddress,
-            payload,
+            abi.encode(greeting), // payload
             0, // no receiver value needed since we're just passing a message
             GAS_LIMIT
         );
+
         if (msg.value > cost) {
             (bool success, ) = msg.sender.call{value: msg.value - cost}("");
             require(success, "Returning excess funds failed");
@@ -58,11 +55,16 @@ contract HelloWormhole is IWormholeReceiver {
         uint16 sourceChain,
         bytes32 // deliveryHash
     ) public payable override {
-        address sender = fromWormholeFormat(sourceAddress);
         string memory greeting = abi.decode(payload, (string));
-
-        emit GreetingReceived(greeting, sourceChain, sender);
         greetings.push(greeting);
+
+        require(registeredChains[sourceChain] == fromWormholeFormat(sourceAddress));
+
+        emit GreetingReceived(
+            greeting,
+            sourceChain,
+            fromWormholeFormat(sourceAddress)
+        );
     }
 }
 

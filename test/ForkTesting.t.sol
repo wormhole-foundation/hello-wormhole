@@ -24,10 +24,10 @@ contract HelloWormholeTest is WormholeRelayerTest {
     }
 
     function testGreeting() public {
-        uint256 cost = helloSource.quoteGreeting(targetChain);
+        uint256 cost = helloSource.quoteCrossChainGreeting(targetChain);
 
         vm.recordLogs();
-        helloSource.sendGreeting{value: cost}(
+        helloSource.sendCrossChainGreeting{value: cost}(
             targetChain,
             address(helloTarget),
             "Hello Wormhole!"
