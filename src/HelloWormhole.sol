@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "./interfaces/IWormholeRelayer.sol";
-import "./interfaces/IWormholeReceiver.sol";
+import "wormhole-relayer-sdk/interfaces/IWormholeRelayer.sol";
+import "wormhole-relayer-sdk/interfaces/IWormholeReceiver.sol";
 
 contract HelloWormhole is IWormholeReceiver {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
@@ -55,10 +55,10 @@ contract HelloWormhole is IWormholeReceiver {
         uint16 sourceChain,
         bytes32 // deliveryHash
     ) public payable override {
+        require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
+
         string memory greeting = abi.decode(payload, (string));
         greetings.push(greeting);
-
-        require(registeredChains[sourceChain] == fromWormholeFormat(sourceAddress));
 
         emit GreetingReceived(
             greeting,
