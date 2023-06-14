@@ -17,9 +17,14 @@ contract HelloWormhole is IWormholeReceiver {
         wormholeRelayer = IWormholeRelayer(_wormholeRelayer);
     }
 
-    function quoteGreeting(
+    /**
+     * @notice Returns the cost (in wei) of a greeting
+     */
+    function quoteCrossChainGreeting(
         uint16 targetChain
     ) public view returns (uint256 cost) {
+        // Cost of requesting a message to be sent to
+        // chain 'targetChain' with a gasLimit of 'GAS_LIMIT'
         (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
             targetChain,
             0,
@@ -27,22 +32,25 @@ contract HelloWormhole is IWormholeReceiver {
         );
     }
 
-    function sendGreeting(
+    /**
+     * @notice Updates the list of 'greetings' 
+     * and emits a 'GreetingReceived' event with 'greeting'
+     * on the HelloWormhole contract at 
+     * chain 'targetChain' and address 'targetAddress'
+     */
+    function sendCrossChainGreeting(
         uint16 targetChain,
         address targetAddress,
         string memory greeting
     ) public payable {
         bytes memory payload = abi.encode(greeting);
-        (uint256 cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
-            targetChain,
-            0,
-            GAS_LIMIT
-        );
+        uint256 cost = quoteCrossChainGreeting(targetChain);
+	    require(msg.value >= cost);
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             targetChain,
             targetAddress,
             payload,
-            0, // no receiver value needed since we're just passing a message
+            0, // no receiver value needed
             GAS_LIMIT
         );
         if (msg.value > cost) {
@@ -51,6 +59,10 @@ contract HelloWormhole is IWormholeReceiver {
         }
     }
 
+    /**
+     * @notice Endpoint that the Wormhole Relayer contract will call
+     * to deliver the greeting
+     */
     function receiveWormholeMessages(
         bytes memory payload,
         bytes[] memory, // additionalVaas
@@ -58,6 +70,8 @@ contract HelloWormhole is IWormholeReceiver {
         uint16 sourceChain,
         bytes32 // deliveryHash
     ) public payable override {
+        require(msg.sender == address(wormholeRelayer));
+
         address sender = fromWormholeFormat(sourceAddress);
         string memory greeting = abi.decode(payload, (string));
 
@@ -71,3 +85,7 @@ function fromWormholeFormat(bytes32 whFormatAddress) pure returns (address) {
         revert NotAnEvmAddress(whFormatAddress);
     return address(uint160(uint256(whFormatAddress)));
 }
+  
+  
+        
+   
