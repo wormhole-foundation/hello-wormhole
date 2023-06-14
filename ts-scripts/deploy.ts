@@ -1,36 +1,30 @@
-import { ethers } from "ethers"
-import { HelloTokens__factory, ERC20Mock__factory } from "./ethers-contracts"
+import { HelloWormhole__factory } from "./ethers-contracts"
 import {
   loadConfig,
   getWallet,
   storeDeployedAddresses,
   getChain,
-  wait,
   loadDeployedAddresses,
 } from "./utils"
 
 export async function deploy() {
   const config = loadConfig()
 
-  // fuij and celo
   const deployed = loadDeployedAddresses()
-  for (const chainId of [6, 14]) {
+  for (const chainId of config.chains.map(c => c.chainId)) {
     const chain = getChain(chainId)
     const signer = getWallet(chainId)
 
-    const helloTokens = await new HelloTokens__factory(signer).deploy(
-      chain.wormholeRelayer,
-      chain.tokenBridge!,
-      chain.wormhole
+    const helloWormhole = await new HelloWormhole__factory(signer).deploy(
+      chain.wormholeRelayer
     )
-    await helloTokens.deployed()
+    await helloWormhole.deployed()
 
-    deployed.helloTokens[chainId] = helloTokens.address
+    deployed.helloWormhole[chainId] = helloWormhole.address
     console.log(
-      `HelloTokens deployed to ${helloTokens.address} on chain ${chainId}`
+      `HelloWormhole deployed to ${helloWormhole.address} on chain ${chainId}`
     )
   }
 
   storeDeployedAddresses(deployed)
 }
-

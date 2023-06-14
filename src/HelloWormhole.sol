@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "./interfaces/IWormholeRelayer.sol";
-import "./interfaces/IWormholeReceiver.sol";
+import "wormhole-relayer-sdk/interfaces/IWormholeRelayer.sol";
+import "wormhole-relayer-sdk/interfaces/IWormholeReceiver.sol";
 
 contract HelloWormhole is IWormholeReceiver {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
 
     uint256 constant GAS_LIMIT = 50_000;
-    
+
     IWormholeRelayer public immutable wormholeRelayer;
 
     string[] public greetings;
@@ -43,16 +43,16 @@ contract HelloWormhole is IWormholeReceiver {
         address targetAddress,
         string memory greeting
     ) public payable {
-        bytes memory payload = abi.encode(greeting);
         uint256 cost = quoteCrossChainGreeting(targetChain);
-	    require(msg.value >= cost);
+
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             targetChain,
             targetAddress,
-            payload,
-            0, // no receiver value needed
+            abi.encode(greeting), // payload
+            0, // no receiver value needed since we're just passing a message
             GAS_LIMIT
         );
+
         if (msg.value > cost) {
             (bool success, ) = msg.sender.call{value: msg.value - cost}("");
             require(success, "Returning excess funds failed");
@@ -70,13 +70,16 @@ contract HelloWormhole is IWormholeReceiver {
         uint16 sourceChain,
         bytes32 // deliveryHash
     ) public payable override {
-        require(msg.sender == address(wormholeRelayer));
+        require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
 
-        address sender = fromWormholeFormat(sourceAddress);
         string memory greeting = abi.decode(payload, (string));
-
-        emit GreetingReceived(greeting, sourceChain, sender);
         greetings.push(greeting);
+
+        emit GreetingReceived(
+            greeting,
+            sourceChain,
+            fromWormholeFormat(sourceAddress)
+        );
     }
 }
 

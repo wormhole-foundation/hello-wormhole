@@ -14,7 +14,7 @@ export interface Config {
   chains: ChainInfo[]
 }
 export interface DeployedAddresses {
-  helloTokens: Record<number, string>
+  helloWormhole: Record<number, string>
   erc20s: Record<number, string[]>
 }
 
@@ -44,17 +44,23 @@ export function loadConfig(): Config {
   return _config!
 }
 
-export function loadDeployedAddresses(): DeployedAddresses {
+export function loadDeployedAddresses(fileMustBePresent?: "fileMustBePresent"): DeployedAddresses {
   if (!_deployed) {
+    try {
     _deployed = JSON.parse(
       readFileSync("ts-scripts/testnet/deployedAddresses.json", {
         encoding: "utf-8",
       })
     )
-    if (!deployed) {
+    } catch (e) {
+      if (fileMustBePresent) {
+        throw e
+      }
+    }
+    if (!_deployed) {
       _deployed = {
         erc20s: [],
-        helloTokens: [],
+        helloWormhole: [],
       }
     }
   }
@@ -66,6 +72,13 @@ export function storeDeployedAddresses(deployed: DeployedAddresses) {
     "ts-scripts/testnet/deployedAddresses.json",
     JSON.stringify(deployed, undefined, 2)
   )
+}
+
+export function checkSubcommand(patterns: string | string[]) {
+  if ("string" === typeof patterns) {
+    patterns = [patterns]
+  }
+  return patterns.includes(process.argv[2])
 }
 
 export function checkFlag(patterns: string | string[]) {

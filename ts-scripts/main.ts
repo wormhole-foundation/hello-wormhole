@@ -1,78 +1,82 @@
 import * as ethers from "ethers"
 import {
   checkFlag,
+  checkSubcommand,
+  getArg,
   loadDeployedAddresses as getDeployedAddresses,
   getWallet,
+  loadConfig,
   wait,
 } from "./utils"
-import { ERC20Mock__factory, HelloTokens__factory } from "./ethers-contracts"
+import { HelloWormhole, HelloWormhole__factory } from "./ethers-contracts"
 import { deploy } from "./deploy"
-import { deployMockTokens } from "./deploy-mock-tokens"
 
 async function main() {
-  if (checkFlag("--sendRemoteLP")) {
-    await sendRemoteLP()
+  console.log(process.argv)
+  if (checkSubcommand("sendGreeting")) {
+    await sendGreeting()
     return
   }
-  if (checkFlag("--deployHelloTokens")) {
+  if (checkSubcommand("deploy")) {
     await deploy()
     return
   }
-  if (checkFlag("--deployMockTokens")) {
-    await deployMockTokens()
+  if (checkSubcommand("read")) {
+    await read()
     return
   }
-
-  // await read();
 }
 
-async function sendRemoteLP() {
+async function sendGreeting() {
   // const from = Number(getArg(["--from", "-f"]))
   // const to = Number(getArg(["--to", "-t"]))
-  // const amount = getArg(["--amount", "-a"])
 
   const from = 6
   const to = 14
-  const amount = ethers.utils.parseEther("10")
+  const greeting = getArg(["--greeting", "-g"]) ?? "Hello, Wormhole!"
 
-  const helloToken = getHelloToken(from)
-  const cost = await helloToken.quoteRemoteLP(to)
+  const helloWormhole = getHelloWormhole(from)
+  const cost = await helloWormhole.quoteGreeting(to)
   console.log(`cost: ${ethers.utils.formatEther(cost)}`)
 
-  const [HT, GbT] = getDeployedAddresses().erc20s[from].map(erc20 =>
-    ERC20Mock__factory.connect(erc20, getWallet(from))
-  )
-
-  const rx = await helloToken
-    .sendRemoteLP(
-      to,
-      getHelloToken(to).address,
-      amount,
-      HT.address,
-      GbT.address
-    )
+  const rx = await helloWormhole
+    .sendGreeting(to, getHelloWormhole(to).address, greeting, {value: cost})
     .then(wait)
 }
 
-function getHelloToken(chainId: number) {
-  const deployed = getDeployedAddresses().helloTokens[chainId]
+function getHelloWormhole(chainId: number): HelloWormhole {
+  const deployed = getDeployedAddresses().helloWormhole[chainId]
   if (!deployed) {
-    throw new Error(`No deployed hello token on chain ${chainId}`)
+    throw new Error(`No deployed hello wormhole on chain ${chainId}`)
   }
-  return HelloTokens__factory.connect(deployed, getWallet(chainId))
+  return HelloWormhole__factory.connect(deployed, getWallet(chainId))
 }
 
-// async function read(s = "State: ") {
-//   for (const deployed of getDeployedAddresses().counter) {
-//     const counter = Counter__factory.connect(
-//       deployed.address,
-//       getWallet(deployed.chainId)
-//     )
-//     const number = await counter.getNumber()
-//     s += `chain ${deployed.chainId}: ${number} `
-//   }
-//   console.log(s)
-// }
+async function read(s = "State: \n\n") {
+  for (const chainId of loadConfig().chains.map(c => c.chainId)) {
+    let i = 0
+    let greetings: string[] = []
+    const helloWormhole = getHelloWormhole(chainId)
+    while (true) {
+      try {
+        let greeting = await helloWormhole.greetings(i)
+        greetings.push(greeting)
+        i++
+      } catch (error) {
+        // Assuming the error is because we've reached the end of the array
+        // This is not a great way to check this, and it won't always work
+        break
+      }
+    }
+
+    s += `chain ${chainId}:\n`
+    for (const greeting of greetings) {
+      s += `\n  ${greeting}`
+    }
+    s += "\n"
+  }
+  console.log(s)
+}
 
 main().catch(e => {
   console.error(e)
