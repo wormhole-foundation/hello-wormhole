@@ -36,11 +36,11 @@ async function sendGreeting() {
   const greeting = getArg(["--greeting", "-g"]) ?? "Hello, Wormhole!"
 
   const helloWormhole = getHelloWormhole(from)
-  const cost = await helloWormhole.quoteGreeting(to)
+  const cost = await helloWormhole.quoteCrossChainGreeting(to)
   console.log(`cost: ${ethers.utils.formatEther(cost)}`)
 
   const rx = await helloWormhole
-    .sendGreeting(to, getHelloWormhole(to).address, greeting, {value: cost})
+    .sendCrossChainGreeting(to, getHelloWormhole(to).address, greeting, {value: cost})
     .then(wait)
 }
 

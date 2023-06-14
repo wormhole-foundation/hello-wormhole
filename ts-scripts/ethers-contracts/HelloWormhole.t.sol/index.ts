@@ -2,3 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { HelloWormholeTest } from "./HelloWormholeTest";
+export type { SavingsAccountTest } from "./SavingsAccountTest";

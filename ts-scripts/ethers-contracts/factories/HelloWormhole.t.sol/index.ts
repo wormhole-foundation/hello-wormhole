@@ -2,3 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 export { HelloWormholeTest__factory } from "./HelloWormholeTest__factory";
+export { SavingsAccountTest__factory } from "./SavingsAccountTest__factory";

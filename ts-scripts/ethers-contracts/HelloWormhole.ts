@@ -29,18 +29,18 @@ import type {
 export interface HelloWormholeInterface extends utils.Interface {
   functions: {
     "greetings(uint256)": FunctionFragment;
-    "quoteGreeting(uint16)": FunctionFragment;
+    "quoteCrossChainGreeting(uint16)": FunctionFragment;
     "receiveWormholeMessages(bytes,bytes[],bytes32,uint16,bytes32)": FunctionFragment;
-    "sendGreeting(uint16,address,string)": FunctionFragment;
+    "sendCrossChainGreeting(uint16,address,string)": FunctionFragment;
     "wormholeRelayer()": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
       | "greetings"
-      | "quoteGreeting"
+      | "quoteCrossChainGreeting"
       | "receiveWormholeMessages"
-      | "sendGreeting"
+      | "sendCrossChainGreeting"
       | "wormholeRelayer"
   ): FunctionFragment;
 
@@ -49,7 +49,7 @@ export interface HelloWormholeInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "quoteGreeting",
+    functionFragment: "quoteCrossChainGreeting",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -57,7 +57,7 @@ export interface HelloWormholeInterface extends utils.Interface {
     values: [BytesLike, BytesLike[], BytesLike, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "sendGreeting",
+    functionFragment: "sendCrossChainGreeting",
     values: [BigNumberish, string, string]
   ): string;
   encodeFunctionData(
@@ -67,7 +67,7 @@ export interface HelloWormholeInterface extends utils.Interface {
 
   decodeFunctionResult(functionFragment: "greetings", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "quoteGreeting",
+    functionFragment: "quoteCrossChainGreeting",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -75,7 +75,7 @@ export interface HelloWormholeInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "sendGreeting",
+    functionFragment: "sendCrossChainGreeting",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -132,7 +132,7 @@ export interface HelloWormhole extends BaseContract {
   functions: {
     greetings(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
-    quoteGreeting(
+    quoteCrossChainGreeting(
       targetChain: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { cost: BigNumber }>;
@@ -146,7 +146,7 @@ export interface HelloWormhole extends BaseContract {
       overrides?: PayableOverrides & { from?: string }
     ): Promise<ContractTransaction>;
 
-    sendGreeting(
+    sendCrossChainGreeting(
       targetChain: BigNumberish,
       targetAddress: string,
       greeting: string,
@@ -158,7 +158,7 @@ export interface HelloWormhole extends BaseContract {
 
   greetings(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-  quoteGreeting(
+  quoteCrossChainGreeting(
     targetChain: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -172,7 +172,7 @@ export interface HelloWormhole extends BaseContract {
     overrides?: PayableOverrides & { from?: string }
   ): Promise<ContractTransaction>;
 
-  sendGreeting(
+  sendCrossChainGreeting(
     targetChain: BigNumberish,
     targetAddress: string,
     greeting: string,
@@ -184,7 +184,7 @@ export interface HelloWormhole extends BaseContract {
   callStatic: {
     greetings(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-    quoteGreeting(
+    quoteCrossChainGreeting(
       targetChain: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -198,7 +198,7 @@ export interface HelloWormhole extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    sendGreeting(
+    sendCrossChainGreeting(
       targetChain: BigNumberish,
       targetAddress: string,
       greeting: string,
@@ -227,7 +227,7 @@ export interface HelloWormhole extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    quoteGreeting(
+    quoteCrossChainGreeting(
       targetChain: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -241,7 +241,7 @@ export interface HelloWormhole extends BaseContract {
       overrides?: PayableOverrides & { from?: string }
     ): Promise<BigNumber>;
 
-    sendGreeting(
+    sendCrossChainGreeting(
       targetChain: BigNumberish,
       targetAddress: string,
       greeting: string,
@@ -257,7 +257,7 @@ export interface HelloWormhole extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    quoteGreeting(
+    quoteCrossChainGreeting(
       targetChain: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -271,7 +271,7 @@ export interface HelloWormhole extends BaseContract {
       overrides?: PayableOverrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
-    sendGreeting(
+    sendCrossChainGreeting(
       targetChain: BigNumberish,
       targetAddress: string,
       greeting: string,
