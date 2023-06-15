@@ -2,12 +2,13 @@
 pragma solidity ^0.8.13;
 
 import "wormhole-relayer-sdk/interfaces/IWormholeRelayer.sol";
-import "wormhole-relayer-sdk/interfaces/IWormholeReceiver.sol";
+import "wormhole-relayer-sdk/PayloadReceiver.sol";
+import "wormhole-relayer-sdk/Utils.sol";
 
-contract HelloWormhole is IWormholeReceiver {
+contract HelloWormhole is PayloadReceiver {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
 
-    uint256 constant GAS_LIMIT = 50_000;
+    uint256 constant GAS_LIMIT = 100_000;
 
     IWormholeRelayer public immutable wormholeRelayer;
 
@@ -17,22 +18,14 @@ contract HelloWormhole is IWormholeReceiver {
         wormholeRelayer = IWormholeRelayer(_wormholeRelayer);
     }
 
-    function quoteCrossChainGreeting(
-        uint16 targetChain
-    ) public view returns (uint256 cost) {
-        (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
-            targetChain,
-            0,
-            GAS_LIMIT
-        );
-    }
+    function quoteCrossChainGreeting(uint16 targetChain) public view returns (uint256 cost) {
+        (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, 0, GAS_LIMIT);
+    } 
 
-    function sendCrossChainGreeting(
-        uint16 targetChain,
-        address targetAddress,
-        string memory greeting
-    ) public payable {
+    function sendCrossChainGreeting(uint16 targetChain, address targetAddress, string memory greeting) public payable {
         uint256 cost = quoteCrossChainGreeting(targetChain);
+
+        require(msg.value == cost, "Payment not correct");
 
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             targetChain,
@@ -41,35 +34,14 @@ contract HelloWormhole is IWormholeReceiver {
             0, // no receiver value needed since we're just passing a message
             GAS_LIMIT
         );
-
-        if (msg.value > cost) {
-            (bool success, ) = msg.sender.call{value: msg.value - cost}("");
-            require(success, "Returning excess funds failed");
-        }
     }
 
-    function receiveWormholeMessages(
-        bytes memory payload,
-        bytes[] memory, // additionalVaas
-        bytes32 sourceAddress,
-        uint16 sourceChain,
-        bytes32 // deliveryHash
-    ) public payable override {
+    function receivePayload(bytes memory payload, address sourceAddress, uint16 sourceChain) internal override {
         require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
 
         string memory greeting = abi.decode(payload, (string));
         greetings.push(greeting);
 
-        emit GreetingReceived(
-            greeting,
-            sourceChain,
-            fromWormholeFormat(sourceAddress)
-        );
-    }
-}
-
-function fromWormholeFormat(bytes32 whFormatAddress) pure returns (address) {
-    if (uint256(whFormatAddress) >> 160 != 0)
-        revert NotAnEvmAddress(whFormatAddress);
-    return address(uint160(uint256(whFormatAddress)));
+        emit GreetingReceived(greeting, sourceChain, sourceAddress);
+    } 
 }
