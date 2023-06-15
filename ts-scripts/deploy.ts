@@ -21,8 +21,9 @@ export async function deploy() {
     await helloWormhole.deployed()
 
     deployed.helloWormhole[chainId] = helloWormhole.address
+    
     console.log(
-      `HelloWormhole deployed to ${helloWormhole.address} on chain ${chainId}`
+      `HelloWormhole deployed to ${helloWormhole.address} on ${chain.description} (chain ${chainId})`
     )
   }
 

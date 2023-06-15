@@ -8,7 +8,7 @@
   "scripts": {
     "main": "ts-node ./ts-scripts/main.ts",
     "deploy": "ts-node ./ts-scripts/deploy.ts",
-    "build": "forge build; yarn typechain",
+    "build": "yarn install; forge build; yarn typechain",
     "typechain": "typechain --target ethers-v5 --out-dir ./ts-scripts/ethers-contracts ./out/**/*.json"
   },
   "dependencies": {
