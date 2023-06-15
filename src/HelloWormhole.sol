@@ -7,20 +7,17 @@ import "wormhole-relayer-sdk/interfaces/IWormholeReceiver.sol";
 contract HelloWormhole is IWormholeReceiver {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
 
-    // The maximum gas we're willing to pay to relay a message.
-    // Note: In this case we're hardcoding a gas limit, in a production
-    // level application some logic around the max gas the contract
-    // is willing to pay is likely warranted.
+    // The maximum gas we're willing to pay to cover the gas
+    // cost on the target chain.
     uint256 constant GAS_LIMIT = 50_000;
 
-    // The interface for the contract that will handle relaying
-    // our message across chains
+    // The contract that will handle relaying our message across chains
     IWormholeRelayer public immutable wormholeRelayer;
 
     string[] public greetings;
 
     constructor(address _wormholeRelayer) {
-        // setup the relayer we're using
+        // Initialize the WormholeRelayer class variable
         wormholeRelayer = IWormholeRelayer(_wormholeRelayer);
     }
 
@@ -28,15 +25,15 @@ contract HelloWormhole is IWormholeReceiver {
      * @notice Returns the price to request a relay to chain `targetChain`, using the default delivery provider
      *
      * @param targetChain in Wormhole Chain ID format
-     * @return cost Price, in units of current chain currency, that the delivery provider charges to perform the relay
+     * @return cost in units of current chain currency, that the delivery provider charges to perform the relay
      */
     function quoteCrossChainGreeting(
         uint16 targetChain
     ) public view returns (uint256 cost) {
         (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
             targetChain, // Wormhole Chain ID
-            0, // value we're sending in the message (added to the returned cost)
-            GAS_LIMIT // The maximum gas we're willing to cover
+            0, // value we want sent to the target contract on the target chain (Note: this is added to the returned `cost`)
+            GAS_LIMIT // The gas limit the target contract will be called with.  
         );
     }
 
@@ -71,7 +68,7 @@ contract HelloWormhole is IWormholeReceiver {
             targetAddress, // Intended recipient of the message (contract address on target chain)
             abi.encode(greeting), // payload
             0, // no receiver value needed since we're just passing a message
-            GAS_LIMIT // Maximum
+            GAS_LIMIT // gas limit the target contract should be called with 
         );
 
         // If the caller passed more value than is used to cover the cross chain call,
@@ -84,10 +81,10 @@ contract HelloWormhole is IWormholeReceiver {
 
     /**
      * @notice Receives the `greeting` message sent from the source chain. Invoked
-     * by the relayer.
+     * by the WormholeRelayer contract.
      *
-     * @param payload The raw payload sent from the origin chain
-     * @param sourceAddress The raw payload sent from the origin chain
+     * @param payload The raw payload sent from the source chain
+     * @param sourceAddress The raw payload sent from the source chain
      * @param sourceChain the address of the contract on the target chain the message should be relayed to
      */
     function receiveWormholeMessages(
@@ -98,6 +95,8 @@ contract HelloWormhole is IWormholeReceiver {
         bytes32 // deliveryHash
     ) public payable override {
         // Don't allow any messages from senders besides the one we're expecting
+        // Requiring the sender be from the WormholeRelayer enforces the invariants
+        // checked in the WormholeRelayer.
         require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
 
         // Just add the greeting string to the array.

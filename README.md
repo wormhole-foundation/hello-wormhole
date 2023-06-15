@@ -47,7 +47,7 @@ install dependencies and build the project
 
 ```sh
 yarn
-yarn run build
+yarn build
 ```
 
 Run the unit tests

@@ -3,8 +3,6 @@
 /* eslint-disable */
 import type * as erc20MockSol from "./ERC20Mock.sol";
 export type { erc20MockSol };
-import type * as helloWormholeSSol from "./HelloWormhole.s.sol";
-export type { helloWormholeSSol };
 import type * as helloWormholeTSol from "./HelloWormhole.t.sol";
 export type { helloWormholeTSol };
 import type * as iWormholeRelayerSol from "./IWormholeRelayer.sol";
@@ -25,7 +23,6 @@ export type { ITokenBridge } from "./ITokenBridge";
 export type { IWormhole } from "./IWormhole";
 export type { IWormholeReceiver } from "./IWormholeReceiver";
 export type { MockWormholeRelayer } from "./MockWormholeRelayer";
-export type { Script } from "./Script";
 export type { StdAssertions } from "./StdAssertions";
 export type { StdInvariant } from "./StdInvariant";
 export type { Test } from "./Test";
@@ -37,13 +34,9 @@ export type { ERC20 } from "./ERC20Mock.sol/ERC20";
 export { ERC20__factory } from "./factories/ERC20Mock.sol/ERC20__factory";
 export type { ERC20Mock } from "./ERC20Mock.sol/ERC20Mock";
 export { ERC20Mock__factory } from "./factories/ERC20Mock.sol/ERC20Mock__factory";
-export type { HelloWormholeScript } from "./HelloWormhole.s.sol/HelloWormholeScript";
-export { HelloWormholeScript__factory } from "./factories/HelloWormhole.s.sol/HelloWormholeScript__factory";
 export { HelloWormhole__factory } from "./factories/HelloWormhole__factory";
 export type { HelloWormholeTest } from "./HelloWormhole.t.sol/HelloWormholeTest";
 export { HelloWormholeTest__factory } from "./factories/HelloWormhole.t.sol/HelloWormholeTest__factory";
-export type { SavingsAccountTest } from "./HelloWormhole.t.sol/SavingsAccountTest";
-export { SavingsAccountTest__factory } from "./factories/HelloWormhole.t.sol/SavingsAccountTest__factory";
 export { IERC20__factory } from "./factories/IERC20__factory";
 export { IMulticall3__factory } from "./factories/IMulticall3__factory";
 export { ITokenBridge__factory } from "./factories/ITokenBridge__factory";
@@ -58,7 +51,6 @@ export { IWormholeRelayerDelivery__factory } from "./factories/IWormholeRelayer.
 export type { IWormholeRelayerSend } from "./IWormholeRelayer.sol/IWormholeRelayerSend";
 export { IWormholeRelayerSend__factory } from "./factories/IWormholeRelayer.sol/IWormholeRelayerSend__factory";
 export { MockWormholeRelayer__factory } from "./factories/MockWormholeRelayer__factory";
-export { Script__factory } from "./factories/Script__factory";
 export { StdAssertions__factory } from "./factories/StdAssertions__factory";
 export type { StdError } from "./StdError.sol/StdError";
 export { StdError__factory } from "./factories/StdError.sol/StdError__factory";

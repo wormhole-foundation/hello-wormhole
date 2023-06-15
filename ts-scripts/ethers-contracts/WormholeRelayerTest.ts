@@ -4,6 +4,7 @@
 import type {
   BaseContract,
   BigNumber,
+  BigNumberish,
   BytesLike,
   CallOverrides,
   ContractTransaction,
@@ -23,7 +24,7 @@ import type {
   TypedEvent,
   TypedListener,
   OnEvent,
-} from "../common";
+} from "./common";
 
 export declare namespace StdInvariant {
   export type FuzzSelectorStruct = { addr: string; selectors: BytesLike[] };
@@ -34,35 +35,81 @@ export declare namespace StdInvariant {
   };
 }
 
-export interface TestInterface extends utils.Interface {
+export interface WormholeRelayerTestInterface extends utils.Interface {
   functions: {
+    "CELO_URL()": FunctionFragment;
+    "FUJI_URL()": FunctionFragment;
     "IS_TEST()": FunctionFragment;
+    "createAndAttestToken(uint256)": FunctionFragment;
     "excludeArtifacts()": FunctionFragment;
     "excludeContracts()": FunctionFragment;
     "excludeSenders()": FunctionFragment;
     "failed()": FunctionFragment;
+    "guardianSource()": FunctionFragment;
+    "guardianTarget()": FunctionFragment;
+    "logFork()": FunctionFragment;
+    "performDelivery(uint8)": FunctionFragment;
+    "relayerSource()": FunctionFragment;
+    "relayerTarget()": FunctionFragment;
+    "setUp()": FunctionFragment;
+    "setUpSource()": FunctionFragment;
+    "setUpTarget()": FunctionFragment;
+    "sourceChain()": FunctionFragment;
+    "sourceFork()": FunctionFragment;
     "targetArtifactSelectors()": FunctionFragment;
     "targetArtifacts()": FunctionFragment;
+    "targetChain()": FunctionFragment;
     "targetContracts()": FunctionFragment;
+    "targetFork()": FunctionFragment;
     "targetSelectors()": FunctionFragment;
     "targetSenders()": FunctionFragment;
+    "tokenBridgeSource()": FunctionFragment;
+    "tokenBridgeTarget()": FunctionFragment;
+    "wormholeSource()": FunctionFragment;
+    "wormholeTarget()": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
+      | "CELO_URL"
+      | "FUJI_URL"
       | "IS_TEST"
+      | "createAndAttestToken"
       | "excludeArtifacts"
       | "excludeContracts"
       | "excludeSenders"
       | "failed"
+      | "guardianSource"
+      | "guardianTarget"
+      | "logFork"
+      | "performDelivery"
+      | "relayerSource"
+      | "relayerTarget"
+      | "setUp"
+      | "setUpSource"
+      | "setUpTarget"
+      | "sourceChain"
+      | "sourceFork"
       | "targetArtifactSelectors"
       | "targetArtifacts"
+      | "targetChain"
       | "targetContracts"
+      | "targetFork"
       | "targetSelectors"
       | "targetSenders"
+      | "tokenBridgeSource"
+      | "tokenBridgeTarget"
+      | "wormholeSource"
+      | "wormholeTarget"
   ): FunctionFragment;
 
+  encodeFunctionData(functionFragment: "CELO_URL", values?: undefined): string;
+  encodeFunctionData(functionFragment: "FUJI_URL", values?: undefined): string;
   encodeFunctionData(functionFragment: "IS_TEST", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "createAndAttestToken",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "excludeArtifacts",
     values?: undefined
@@ -77,6 +124,44 @@ export interface TestInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "failed", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "guardianSource",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "guardianTarget",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "logFork", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "performDelivery",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "relayerSource",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "relayerTarget",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "setUp", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "setUpSource",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setUpTarget",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "sourceChain",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "sourceFork",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "targetArtifactSelectors",
     values?: undefined
   ): string;
@@ -85,7 +170,15 @@ export interface TestInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "targetChain",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "targetContracts",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "targetFork",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -96,8 +189,30 @@ export interface TestInterface extends utils.Interface {
     functionFragment: "targetSenders",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "tokenBridgeSource",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenBridgeTarget",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "wormholeSource",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "wormholeTarget",
+    values?: undefined
+  ): string;
 
+  decodeFunctionResult(functionFragment: "CELO_URL", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "FUJI_URL", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "IS_TEST", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "createAndAttestToken",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "excludeArtifacts",
     data: BytesLike
@@ -112,6 +227,41 @@ export interface TestInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "failed", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "guardianSource",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "guardianTarget",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "logFork", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "performDelivery",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "relayerSource",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "relayerTarget",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "setUp", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setUpSource",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setUpTarget",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "sourceChain",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "sourceFork", data: BytesLike): Result;
+  decodeFunctionResult(
     functionFragment: "targetArtifactSelectors",
     data: BytesLike
   ): Result;
@@ -120,15 +270,36 @@ export interface TestInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "targetChain",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "targetContracts",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "targetFork", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "targetSelectors",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "targetSenders",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenBridgeSource",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenBridgeTarget",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "wormholeSource",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "wormholeTarget",
     data: BytesLike
   ): Result;
 
@@ -407,12 +578,12 @@ export type logsEvent = TypedEvent<[string], logsEventObject>;
 
 export type logsEventFilter = TypedEventFilter<logsEvent>;
 
-export interface Test extends BaseContract {
+export interface WormholeRelayerTest extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: TestInterface;
+  interface: WormholeRelayerTestInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -434,7 +605,16 @@ export interface Test extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    CELO_URL(overrides?: CallOverrides): Promise<[string]>;
+
+    FUJI_URL(overrides?: CallOverrides): Promise<[string]>;
+
     IS_TEST(overrides?: CallOverrides): Promise<[boolean]>;
+
+    createAndAttestToken(
+      fork: BigNumberish,
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
 
     excludeArtifacts(
       overrides?: CallOverrides
@@ -452,6 +632,37 @@ export interface Test extends BaseContract {
       overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
+    guardianSource(overrides?: CallOverrides): Promise<[string]>;
+
+    guardianTarget(overrides?: CallOverrides): Promise<[string]>;
+
+    logFork(overrides?: CallOverrides): Promise<[void]>;
+
+    performDelivery(
+      numVaas: BigNumberish,
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
+
+    relayerSource(overrides?: CallOverrides): Promise<[string]>;
+
+    relayerTarget(overrides?: CallOverrides): Promise<[string]>;
+
+    setUp(
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
+
+    setUpSource(
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
+
+    setUpTarget(
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
+
+    sourceChain(overrides?: CallOverrides): Promise<[number]>;
+
+    sourceFork(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     targetArtifactSelectors(
       overrides?: CallOverrides
     ): Promise<
@@ -464,9 +675,13 @@ export interface Test extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string[]] & { targetedArtifacts_: string[] }>;
 
+    targetChain(overrides?: CallOverrides): Promise<[number]>;
+
     targetContracts(
       overrides?: CallOverrides
     ): Promise<[string[]] & { targetedContracts_: string[] }>;
+
+    targetFork(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     targetSelectors(
       overrides?: CallOverrides
@@ -479,9 +694,26 @@ export interface Test extends BaseContract {
     targetSenders(
       overrides?: CallOverrides
     ): Promise<[string[]] & { targetedSenders_: string[] }>;
+
+    tokenBridgeSource(overrides?: CallOverrides): Promise<[string]>;
+
+    tokenBridgeTarget(overrides?: CallOverrides): Promise<[string]>;
+
+    wormholeSource(overrides?: CallOverrides): Promise<[string]>;
+
+    wormholeTarget(overrides?: CallOverrides): Promise<[string]>;
   };
 
+  CELO_URL(overrides?: CallOverrides): Promise<string>;
+
+  FUJI_URL(overrides?: CallOverrides): Promise<string>;
+
   IS_TEST(overrides?: CallOverrides): Promise<boolean>;
+
+  createAndAttestToken(
+    fork: BigNumberish,
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
 
   excludeArtifacts(overrides?: CallOverrides): Promise<string[]>;
 
@@ -493,13 +725,48 @@ export interface Test extends BaseContract {
     overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
+  guardianSource(overrides?: CallOverrides): Promise<string>;
+
+  guardianTarget(overrides?: CallOverrides): Promise<string>;
+
+  logFork(overrides?: CallOverrides): Promise<void>;
+
+  performDelivery(
+    numVaas: BigNumberish,
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  relayerSource(overrides?: CallOverrides): Promise<string>;
+
+  relayerTarget(overrides?: CallOverrides): Promise<string>;
+
+  setUp(
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  setUpSource(
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  setUpTarget(
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  sourceChain(overrides?: CallOverrides): Promise<number>;
+
+  sourceFork(overrides?: CallOverrides): Promise<BigNumber>;
+
   targetArtifactSelectors(
     overrides?: CallOverrides
   ): Promise<StdInvariant.FuzzSelectorStructOutput[]>;
 
   targetArtifacts(overrides?: CallOverrides): Promise<string[]>;
 
+  targetChain(overrides?: CallOverrides): Promise<number>;
+
   targetContracts(overrides?: CallOverrides): Promise<string[]>;
+
+  targetFork(overrides?: CallOverrides): Promise<BigNumber>;
 
   targetSelectors(
     overrides?: CallOverrides
@@ -507,8 +774,25 @@ export interface Test extends BaseContract {
 
   targetSenders(overrides?: CallOverrides): Promise<string[]>;
 
+  tokenBridgeSource(overrides?: CallOverrides): Promise<string>;
+
+  tokenBridgeTarget(overrides?: CallOverrides): Promise<string>;
+
+  wormholeSource(overrides?: CallOverrides): Promise<string>;
+
+  wormholeTarget(overrides?: CallOverrides): Promise<string>;
+
   callStatic: {
+    CELO_URL(overrides?: CallOverrides): Promise<string>;
+
+    FUJI_URL(overrides?: CallOverrides): Promise<string>;
+
     IS_TEST(overrides?: CallOverrides): Promise<boolean>;
+
+    createAndAttestToken(
+      fork: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     excludeArtifacts(overrides?: CallOverrides): Promise<string[]>;
 
@@ -518,19 +802,56 @@ export interface Test extends BaseContract {
 
     failed(overrides?: CallOverrides): Promise<boolean>;
 
+    guardianSource(overrides?: CallOverrides): Promise<string>;
+
+    guardianTarget(overrides?: CallOverrides): Promise<string>;
+
+    logFork(overrides?: CallOverrides): Promise<void>;
+
+    performDelivery(
+      numVaas: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    relayerSource(overrides?: CallOverrides): Promise<string>;
+
+    relayerTarget(overrides?: CallOverrides): Promise<string>;
+
+    setUp(overrides?: CallOverrides): Promise<void>;
+
+    setUpSource(overrides?: CallOverrides): Promise<void>;
+
+    setUpTarget(overrides?: CallOverrides): Promise<void>;
+
+    sourceChain(overrides?: CallOverrides): Promise<number>;
+
+    sourceFork(overrides?: CallOverrides): Promise<BigNumber>;
+
     targetArtifactSelectors(
       overrides?: CallOverrides
     ): Promise<StdInvariant.FuzzSelectorStructOutput[]>;
 
     targetArtifacts(overrides?: CallOverrides): Promise<string[]>;
 
+    targetChain(overrides?: CallOverrides): Promise<number>;
+
     targetContracts(overrides?: CallOverrides): Promise<string[]>;
+
+    targetFork(overrides?: CallOverrides): Promise<BigNumber>;
 
     targetSelectors(
       overrides?: CallOverrides
     ): Promise<StdInvariant.FuzzSelectorStructOutput[]>;
 
     targetSenders(overrides?: CallOverrides): Promise<string[]>;
+
+    tokenBridgeSource(overrides?: CallOverrides): Promise<string>;
+
+    tokenBridgeTarget(overrides?: CallOverrides): Promise<string>;
+
+    wormholeSource(overrides?: CallOverrides): Promise<string>;
+
+    wormholeTarget(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
@@ -635,7 +956,16 @@ export interface Test extends BaseContract {
   };
 
   estimateGas: {
+    CELO_URL(overrides?: CallOverrides): Promise<BigNumber>;
+
+    FUJI_URL(overrides?: CallOverrides): Promise<BigNumber>;
+
     IS_TEST(overrides?: CallOverrides): Promise<BigNumber>;
+
+    createAndAttestToken(
+      fork: BigNumberish,
+      overrides?: Overrides & { from?: string }
+    ): Promise<BigNumber>;
 
     excludeArtifacts(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -645,19 +975,65 @@ export interface Test extends BaseContract {
 
     failed(overrides?: Overrides & { from?: string }): Promise<BigNumber>;
 
+    guardianSource(overrides?: CallOverrides): Promise<BigNumber>;
+
+    guardianTarget(overrides?: CallOverrides): Promise<BigNumber>;
+
+    logFork(overrides?: CallOverrides): Promise<BigNumber>;
+
+    performDelivery(
+      numVaas: BigNumberish,
+      overrides?: Overrides & { from?: string }
+    ): Promise<BigNumber>;
+
+    relayerSource(overrides?: CallOverrides): Promise<BigNumber>;
+
+    relayerTarget(overrides?: CallOverrides): Promise<BigNumber>;
+
+    setUp(overrides?: Overrides & { from?: string }): Promise<BigNumber>;
+
+    setUpSource(overrides?: Overrides & { from?: string }): Promise<BigNumber>;
+
+    setUpTarget(overrides?: Overrides & { from?: string }): Promise<BigNumber>;
+
+    sourceChain(overrides?: CallOverrides): Promise<BigNumber>;
+
+    sourceFork(overrides?: CallOverrides): Promise<BigNumber>;
+
     targetArtifactSelectors(overrides?: CallOverrides): Promise<BigNumber>;
 
     targetArtifacts(overrides?: CallOverrides): Promise<BigNumber>;
 
+    targetChain(overrides?: CallOverrides): Promise<BigNumber>;
+
     targetContracts(overrides?: CallOverrides): Promise<BigNumber>;
+
+    targetFork(overrides?: CallOverrides): Promise<BigNumber>;
 
     targetSelectors(overrides?: CallOverrides): Promise<BigNumber>;
 
     targetSenders(overrides?: CallOverrides): Promise<BigNumber>;
+
+    tokenBridgeSource(overrides?: CallOverrides): Promise<BigNumber>;
+
+    tokenBridgeTarget(overrides?: CallOverrides): Promise<BigNumber>;
+
+    wormholeSource(overrides?: CallOverrides): Promise<BigNumber>;
+
+    wormholeTarget(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    CELO_URL(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    FUJI_URL(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     IS_TEST(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    createAndAttestToken(
+      fork: BigNumberish,
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
 
     excludeArtifacts(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -669,16 +1045,59 @@ export interface Test extends BaseContract {
       overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
+    guardianSource(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    guardianTarget(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    logFork(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    performDelivery(
+      numVaas: BigNumberish,
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    relayerSource(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    relayerTarget(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    setUp(
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    setUpSource(
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    setUpTarget(
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    sourceChain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    sourceFork(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     targetArtifactSelectors(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     targetArtifacts(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    targetChain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     targetContracts(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    targetFork(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     targetSelectors(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     targetSenders(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    tokenBridgeSource(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    tokenBridgeTarget(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    wormholeSource(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    wormholeTarget(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

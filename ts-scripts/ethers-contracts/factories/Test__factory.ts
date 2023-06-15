@@ -4,7 +4,7 @@
 
 import { Contract, Signer, utils } from "ethers";
 import type { Provider } from "@ethersproject/providers";
-import type { Test, TestInterface } from "../../test.sol/Test";
+import type { Test, TestInterface } from "../Test";
 
 const _abi = [
   {

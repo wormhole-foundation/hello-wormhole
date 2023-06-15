@@ -2,7 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as erc20MockSol from "./ERC20Mock.sol";
-export * as helloWormholeSSol from "./HelloWormhole.s.sol";
 export * as helloWormholeTSol from "./HelloWormhole.t.sol";
 export * as iWormholeRelayerSol from "./IWormholeRelayer.sol";
 export * as stdErrorSol from "./StdError.sol";
@@ -17,7 +16,6 @@ export { ITokenBridge__factory } from "./ITokenBridge__factory";
 export { IWormhole__factory } from "./IWormhole__factory";
 export { IWormholeReceiver__factory } from "./IWormholeReceiver__factory";
 export { MockWormholeRelayer__factory } from "./MockWormholeRelayer__factory";
-export { Script__factory } from "./Script__factory";
 export { StdAssertions__factory } from "./StdAssertions__factory";
 export { StdInvariant__factory } from "./StdInvariant__factory";
 export { Test__factory } from "./Test__factory";
