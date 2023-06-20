@@ -55,24 +55,9 @@ function getHelloWormhole(chainId: number): HelloWormhole {
 async function read(s = "State: \n\n") {
   for (const chainId of loadConfig().chains.map(c => c.chainId)) {
     let i = 0
-    let greetings: string[] = []
     const helloWormhole = getHelloWormhole(chainId)
-    while (true) {
-      try {
-        let greeting = await helloWormhole.greetings(i)
-        greetings.push(greeting)
-        i++
-      } catch (error) {
-        // Assuming the error is because we've reached the end of the array
-        // This is not a great way to check this, and it won't always work
-        break
-      }
-    }
-
-    s += `chain ${chainId}:\n`
-    for (const greeting of greetings) {
-      s += `\n  ${greeting}`
-    }
+    const greeting = await helloWormhole.latestGreeting();
+    s += `chain ${chainId}: ${greeting}\n`
     s += "\n"
   }
   console.log(s)
