@@ -153,7 +153,7 @@ In exchange for calling your contract at ‘targetAddress’ on ‘targetChain�
 So, following this interface, we can implement `sendCrossChainGreeting` by simply calling sendPayloadToEvm with the payload being the greeting.
 
 ```solidity
-	uint256 constant GAS_LIMIT = 50_000;
+    uint256 constant GAS_LIMIT = 50_000;
     
     IWormholeRelayer public immutable wormholeRelayer;
 
@@ -193,7 +193,7 @@ So, following this interface, we can implement `sendCrossChainGreeting` by simpl
             0, // no receiver value needed
             GAS_LIMIT
         );
-	 }
+    }
 
 ```
 
@@ -281,7 +281,7 @@ What will happen is, when on the source chain ‘sendPayloadToEvm’ is called, 
             sourceChain,
             fromWormholeFormat(sourceAddress)
         );
-	  }
+    }
 ```
 
 Note: Wormhole encodes EVM addresses into a bytes32 format, by left-padding them with zeroes. This is to allow for compatibility with other ecosystems that have 32-byte addresses. We use a helper 'fromWormholeFormat' here to take the sourceAddress (which is provided to us in bytes32 format) and discard the first 12 bytes.
