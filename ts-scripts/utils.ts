@@ -29,6 +29,7 @@ export function getChain(chainId: number): ChainInfo {
 export function getWallet(chainId: number): Wallet {
   const rpc = loadConfig().chains.find(c => c.chainId === chainId)?.rpc
   let provider = new ethers.providers.JsonRpcProvider(rpc)
+  if(!process.env.EVM_PRIVATE_KEY) throw Error("No private key provided (use the EVM_PRIVATE_KEY environment variable)")
   return new Wallet(process.env.EVM_PRIVATE_KEY!, provider)
 }
 
