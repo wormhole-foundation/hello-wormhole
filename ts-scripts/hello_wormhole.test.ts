@@ -14,7 +14,7 @@ describe("Hello Wormhole Integration Tests on Testnet", () => {
         const targetHelloWormholeContract = getHelloWormhole(targetChain);
 
         const cost = await sourceHelloWormholeContract.quoteCrossChainGreeting(targetChain);
-        console.log(`Cost of sending the greeting: ${cost}`);
+        console.log(`Cost of sending the greeting: ${ethers.utils.formatEther(cost)} testnet AVAX`);
 
         console.log(`Sending greeting: ${arbitraryGreeting}`);
         const tx = await sourceHelloWormholeContract.sendCrossChainGreeting(targetChain, targetHelloWormholeContract.address, arbitraryGreeting, {value: cost});
