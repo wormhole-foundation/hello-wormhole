@@ -100,7 +100,7 @@ Suppose we want users to be able to request through their Ethereum wallet for a 
 We’d want to implement the following function: 
 
 ```solidity
-		/**
+	/**
      * @notice Updates the list of 'greetings' 
      * and emits a 'GreetingReceived' event with 'greeting'
      * on the HelloWormhole contract at 
@@ -193,7 +193,6 @@ So, following this interface, we can implement `sendCrossChainGreeting` by simpl
             0, // no receiver value needed
             GAS_LIMIT
         );
-	    }
 	 }
 
 ```
