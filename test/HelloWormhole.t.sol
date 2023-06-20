@@ -23,13 +23,14 @@ contract HelloWormholeTest is WormholeRelayerTest {
         uint256 cost = helloSource.quoteCrossChainGreeting(targetChain);
 
         vm.recordLogs();
+        
         helloSource.sendCrossChainGreeting{value: cost}(
             targetChain,
             address(helloTarget),
             "Hello Wormhole!"
         );
 
-        performDelivery(1);
+        performDelivery();
 
         vm.selectFork(targetFork);
         assertEq(helloTarget.greetings(0), "Hello Wormhole!");
