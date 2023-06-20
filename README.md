@@ -100,7 +100,7 @@ Suppose we want users to be able to request through their Ethereum wallet for a 
 We’d want to implement the following function: 
 
 ```solidity
-	/**
+    /**
      * @notice Updates the list of 'greetings' 
      * and emits a 'GreetingReceived' event with 'greeting'
      * on the HelloWormhole contract at 
@@ -116,7 +116,7 @@ We’d want to implement the following function:
 The Wormhole Relayer contract lets us do exactly this! Let’s take a look at the Wormhole Relayer contract interface.
 
 ```solidity
-	/**
+    /**
      * @notice Publishes an instruction for the default delivery provider
      * to relay a payload to the address `targetAddress` on chain `targetChain` 
      * with gas limit `gasLimit` and `msg.value` equal to `receiverValue`
@@ -157,7 +157,7 @@ So, following this interface, we can implement `sendCrossChainGreeting` by simpl
     
     IWormholeRelayer public immutable wormholeRelayer;
 
-	/**
+    /**
      * @notice Returns the cost (in wei) of a greeting
      */
     function quoteCrossChainGreeting(
@@ -257,11 +257,11 @@ What will happen is, when on the source chain ‘sendPayloadToEvm’ is called, 
 - Emit a 'GreetingReceived' event with the 'greeting'
 
 ```solidity
-		event GreetingReceived(string greeting, uint16 senderChain, address sender);
+	event GreetingReceived(string greeting, uint16 senderChain, address sender);
 
     string public latestGreeting;
 
-	/**
+    /**
      * @notice Endpoint that the Wormhole Relayer contract will call
      * to deliver the greeting
      */
