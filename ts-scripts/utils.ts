@@ -1,6 +1,8 @@
 import { ethers, Wallet } from "ethers"
 import { readFileSync, writeFileSync } from "fs"
 
+import { HelloWormhole, HelloWormhole__factory } from "./ethers-contracts"
+
 export interface ChainInfo {
   description: string
   chainId: number
@@ -16,6 +18,14 @@ export interface Config {
 export interface DeployedAddresses {
   helloWormhole: Record<number, string>
   erc20s: Record<number, string[]>
+}
+
+export function getHelloWormhole(chainId: number): HelloWormhole {
+  const deployed = loadDeployedAddresses().helloWormhole[chainId]
+  if (!deployed) {
+    throw new Error(`No deployed hello wormhole on chain ${chainId}`)
+  }
+  return HelloWormhole__factory.connect(deployed, getWallet(chainId))
 }
 
 export function getChain(chainId: number): ChainInfo {

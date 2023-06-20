@@ -7,9 +7,10 @@
   "license": "MIT",
   "scripts": {
     "main": "ts-node ./ts-scripts/main.ts",
-    "deploy": "ts-node ./ts-scripts/deploy.ts",
+    "deploy": "ts-node ./ts-scripts/main.ts deploy",
     "build": "npm install; forge build; npm run typechain",
-    "typechain": "typechain --target ethers-v5 --out-dir ./ts-scripts/ethers-contracts ./out/**/*.json"
+    "typechain": "typechain --target ethers-v5 --out-dir ./ts-scripts/ethers-contracts ./out/**/*.json",
+    "test": "jest --config ./ts-scripts/jest.config.js"
   },
   "dependencies": {
     "@certusone/wormhole-sdk": "^0.9.18",
@@ -20,7 +21,10 @@
     "typechain": "^8.2.0"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.2",
     "@types/node": "^20.2.5",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
     "typescript": "^5.1.3"
   }
 }

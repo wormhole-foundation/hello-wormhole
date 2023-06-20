@@ -29,5 +29,3 @@ export async function deploy() {
 
   storeDeployedAddresses(deployed)
 }
-
-deploy();

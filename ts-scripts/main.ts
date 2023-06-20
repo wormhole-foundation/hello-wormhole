@@ -1,18 +1,13 @@
 import * as ethers from "ethers"
 import {
-  checkFlag,
   checkSubcommand,
   getArg,
-  loadDeployedAddresses as getDeployedAddresses,
-  getWallet,
+  getHelloWormhole,
   loadConfig,
-  wait,
 } from "./utils"
-import { HelloWormhole, HelloWormhole__factory } from "./ethers-contracts"
 import { deploy } from "./deploy"
 
 async function main() {
-  console.log(process.argv)
   if (checkSubcommand("sendGreeting")) {
     await sendGreeting()
     return
@@ -39,17 +34,10 @@ async function sendGreeting() {
   const cost = await helloWormhole.quoteCrossChainGreeting(to)
   console.log(`cost: ${ethers.utils.formatEther(cost)}`)
 
-  const rx = await helloWormhole
-    .sendCrossChainGreeting(to, getHelloWormhole(to).address, greeting, {value: cost})
-    .then(wait)
-}
-
-function getHelloWormhole(chainId: number): HelloWormhole {
-  const deployed = getDeployedAddresses().helloWormhole[chainId]
-  if (!deployed) {
-    throw new Error(`No deployed hello wormhole on chain ${chainId}`)
-  }
-  return HelloWormhole__factory.connect(deployed, getWallet(chainId))
+  const tx = await helloWormhole
+    .sendCrossChainGreeting(to, getHelloWormhole(to).address, greeting, {value: cost});
+  await tx.wait();
+  console.log(`Greeting "${greeting}" sent from chain ${from} to chain ${to}\nTransaction hash ${tx.hash}\nView Transaction at https://testnet.snowtrace.io/tx/${tx.hash}`)
 }
 
 async function read(s = "State: \n\n") {
