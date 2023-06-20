@@ -11,7 +11,7 @@ contract HelloWormhole is IWormholeReceiver {
 
     IWormholeRelayer public immutable wormholeRelayer;
 
-    string[] public greetings;
+    string public latestGreeting;
 
     constructor(address _wormholeRelayer) {
         wormholeRelayer = IWormholeRelayer(_wormholeRelayer);
@@ -57,11 +57,10 @@ contract HelloWormhole is IWormholeReceiver {
     ) public payable override {
         require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
 
-        string memory greeting = abi.decode(payload, (string));
-        greetings.push(greeting);
+        latestGreeting = abi.decode(payload, (string));
 
         emit GreetingReceived(
-            greeting,
+            latestGreeting,
             sourceChain,
             fromWormholeFormat(sourceAddress)
         );
