@@ -7,8 +7,9 @@ This repository contains a solidity contract (HelloWormhole.sol) that can be dep
 Included in this repository is:
 
 - Example Solidity Code
-- Example Forge Testing setup
-- Deploy Scripts
+- Example Forge local testing setup
+- Testnet Deploy Scripts
+- Example Testnet testing setup
 
 ### Environment Setup
 
