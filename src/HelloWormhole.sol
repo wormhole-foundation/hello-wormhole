@@ -34,6 +34,8 @@ contract HelloWormhole is IWormholeReceiver {
     ) public payable {
         uint256 cost = quoteCrossChainGreeting(targetChain);
 
+        require(msg.value >= cost);
+
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             targetChain,
             targetAddress,
