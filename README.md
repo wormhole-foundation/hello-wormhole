@@ -39,7 +39,6 @@ You will need a wallet with at least 0.05 Testnet AVAX and 0.01 Testnet CELO.
 - [Obtain testnet CELO here](https://faucet.celo.org/alfajores)
 
 ```bash
-npm run build
 EVM_PRIVATE_KEY=your_wallet_private_key npm run deploy
 ```
 

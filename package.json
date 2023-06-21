@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "main": "ts-node ./ts-scripts/main.ts",
-    "deploy": "ts-node ./ts-scripts/main.ts deploy",
+    "deploy": "npm run build; ts-node ./ts-scripts/main.ts deploy",
     "build": "npm install; forge build; npm run typechain",
     "typechain": "typechain --target ethers-v5 --out-dir ./ts-scripts/ethers-contracts ./out/**/*.json",
     "test": "jest --config ./ts-scripts/jest.config.js"
