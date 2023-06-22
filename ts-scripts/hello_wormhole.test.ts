@@ -1,8 +1,15 @@
 import {describe, expect, test} from "@jest/globals";
 import { ethers } from "ethers";
 import {
-    getHelloWormhole
+    getHelloWormhole,
+    getChain
 } from "./utils"
+import {
+    getStatus
+} from "./getStatus"
+import {
+    CHAIN_ID_TO_NAME
+} from "@certusone/wormhole-sdk"
 
 const sourceChain = 6;
 const targetChain = 14;
@@ -22,11 +29,19 @@ describe("Hello Wormhole Integration Tests on Testnet", () => {
         await tx.wait();
         console.log(`See transaction at: https://testnet.snowtrace.io/tx/${tx.hash}`);
 
-        await new Promise(resolve => setTimeout(resolve, 1000*5));
+        await new Promise(resolve => setTimeout(resolve, 1000*10));
+
+        /*
+        console.log("Checking relay status");
+        console.log(CHAIN_ID_TO_NAME[sourceChain]);
+        const res = await getStatus(CHAIN_ID_TO_NAME[sourceChain], tx.hash);
+        console.log(`Status: ${res.status}`);
+        console.log(`Info: ${res.info}`); */
 
         console.log(`Reading greeting`);
         const readGreeting = await targetHelloWormholeContract.latestGreeting();
         console.log(`Latest greeting: ${readGreeting}`);
         expect(readGreeting).toBe(arbitraryGreeting);
+
     }, 60*1000) // timeout
 })
