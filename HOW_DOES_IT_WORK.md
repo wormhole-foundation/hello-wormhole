@@ -87,11 +87,11 @@ and then calls the `deliver` endpoint on the Wormhole Relayer contract on the ta
 > - parses the VAA off-chain to figure out the correct target chain
 > - and submits the VAA to the ‘deliver’ endpoint on the Wormhole Relayer contract on the target chain
 
-### ******************************************************************************************Step 4: The Wormhole Relayer contract receives the delivery VAA, verifies the guardian signatures, and calls the receiveWormholeMessages() endpoint******************************************************************************************
+### ******************************************************************************************Step 4: The Wormhole Relayer contract receives the delivery VAA, ensures the guardian signatures are valid, and calls the receiveWormholeMessages() endpoint******************************************************************************************
 
 The ‘deliver’ endpoint on the Wormhole Relayer contract, when called by the delivery provider:
 
-- verifies the signatures of the delivery VAA
+- ensures the signatures of the delivery VAA are valid
 - parses the delivery instructions to figure out the targetAddress, payload, gasLimit, receiverValue, etc
 - **calls the ‘receiveWormholeMessages()’ endpoint of ‘targetAddress’** with the payload, as well as additional metadata (e.g. additional VAAs, the source chain, source address, hash of the delivery VAA which can be used as a unique identifier), and with the specified gasLimit and msg.value (receiverValue)
 
