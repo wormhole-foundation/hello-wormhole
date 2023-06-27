@@ -43,9 +43,7 @@ Calling this function will result in the ***************************************
 
 ### ******************************************************************************************Step 1: The Wormhole Relayer contract publishes the Delivery Instructions and pays the Delivery Provider******************************************************************************************
 
-‘sendPayloadToEvm’ works by publishing a ******VAA****** (the [core primitive of wormhole](https://docs.wormhole.com/wormhole/explore-wormhole/vaa) - simply bytes that contain an encoded message). The act of ‘[publishing a VAA](https://github.com/wormhole-foundation/wormhole/blob/632a76792651a4945bda994c7dae389f8eb331e5/ethereum/contracts/Implementation.sol#L15)’ is simply emitting this encoded message to the blockchain logs. 
-
-The specific information that makes up this published message include instructions for how to perform the delivery: the target chain, target address, receiver value, gas limit, payload, and any other necessary information
+‘sendPayloadToEvm’ works by publishing a wormhole message (simply an event containing bytes) with instructions for how to perform the delivery: the target chain, target address, receiver value, gas limit, payload, and any other necessary information
 
 ‘sendPayloadToEvm’ also then ******************************************************pays a delivery provider****************************************************** it’s msg.value.
 
@@ -55,15 +53,15 @@ Delivery Providers are permissionless entities that help power the Wormhole Rela
 >
 > - a user of HelloWormhole calls ‘sendCrossChainGreeting’,
 > - which calls the Wormhole Relayer contract’s ‘sendPayloadToEvm’,
-> - which publishes the delivery instructions as a VAA and pays the default delivery provider
+> - which publishes the delivery instructions to the blockchain logs and pays the default delivery provider
 
-### ******************************************************************************************Step 2: The Guardians sign VAAs******************************************************************************************
+### ******************************************************************************************Step 2: The Guardians create a signed VAAs******************************************************************************************
 
-The wormhole protocol, at it’s core, is publishing messages (VAAs) from blockchains that are signed by a quorum of 19 entities called the [Guardians](https://docs.wormhole.com/wormhole/explore-wormhole/guardian). 
+The wormhole protocol, at it’s core, is publishing messages from blockchains that are then signed by a quorum of 19 entities called the [Guardians](https://docs.wormhole.com/wormhole/explore-wormhole/guardian) to form signed VAAs. 
 
-Each Guardian watches the wormhole-connected blockchains and signs VAAs it sees. Once a VAA obtains 13 of 19 signatures, it is considered fully signed. 
+Each Guardian watches the wormhole-connected blockchains and signs Wormhole events it sees, forming a VAA, the [core primitive of wormhole](https://docs.wormhole.com/wormhole/explore-wormhole/vaa). Once a VAA obtains 13 of 19 signatures, it is considered fully signed. 
 
-> **In our scenario,** 13 of 19 guardians sign the delivery instructions VAA
+> **In our scenario,** 13 of 19 guardians sign the delivery instructions to form a signed VAA
 
 
 ### ******************************************************************************************Step 3: The Delivery Provider watches for signed VAAs containing deliveries that it has been assigned to, and (off chain!) parses the delivery instructions******************************************************************************************
