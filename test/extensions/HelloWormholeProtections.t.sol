@@ -5,18 +5,18 @@ import "../../src/extensions/HelloWormholeProtections.sol";
 
 import "wormhole-relayer-sdk/testing/WormholeRelayerTest.sol";
 
-contract HelloWormholeTest is WormholeRelayerTest {
+contract HelloWormholeProtectionsTest is WormholeRelayerTest {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
 
     HelloWormholeProtections helloSource;
     HelloWormholeProtections helloTarget;
 
     function setUpSource() public override {
-        helloSource = new HelloWormholeProtections(address(relayerSource));
+        helloSource = new HelloWormholeProtections(address(relayerSource), address(wormholeSource));
     }
 
     function setUpTarget() public override {
-        helloTarget = new HelloWormholeProtections(address(relayerTarget));
+        helloTarget = new HelloWormholeProtections(address(relayerTarget), address(wormholeTarget));
         helloTarget.setRegisteredSender(sourceChain, toWormholeFormat(address(helloSource)));
     }
 
@@ -34,7 +34,7 @@ contract HelloWormholeTest is WormholeRelayerTest {
     }
 
     function testGreetingFromWrongSender() public {
-        HelloWormholeProtections fakeHelloSource = new HelloWormholeProtections(address(relayerSource));
+        HelloWormholeProtections fakeHelloSource = new HelloWormholeProtections(address(relayerSource), address(wormholeSource));
         uint256 cost = fakeHelloSource.quoteCrossChainGreeting(targetChain);
 
         vm.recordLogs();

@@ -12,7 +12,7 @@ contract HelloWormholeProtections is Base, IWormholeReceiver {
 
     string public latestGreeting;
 
-    constructor(address _wormholeRelayer) Base(_wormholeRelayer) {}
+    constructor(address _wormholeRelayer, address _wormhole) Base(_wormholeRelayer, _wormhole) {}
 
     function quoteCrossChainGreeting(uint16 targetChain) public view returns (uint256 cost) {
         (cost,) = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, 0, GAS_LIMIT);
