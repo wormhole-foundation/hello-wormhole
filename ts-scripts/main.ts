@@ -4,8 +4,10 @@ import {
   getArg,
   getHelloWormhole,
   loadConfig,
+  checkFlag
 } from "./utils"
 import { deploy } from "./deploy"
+import { getStatus } from "./getStatus"
 
 async function main() {
   if (checkSubcommand("sendGreeting")) {
@@ -19,6 +21,10 @@ async function main() {
   if (checkSubcommand("read")) {
     await read()
     return
+  }
+  if(checkFlag("--getStatus")) {
+    const status = await getStatus("avalanche", getArg(["--txHash", "--tx", "-t"]) || "");
+    console.log(status.info);
   }
 }
 
