@@ -30,7 +30,8 @@ contract HelloWormhole is IWormholeReceiver {
     function sendCrossChainGreeting(
         uint16 targetChain,
         address targetAddress,
-        string memory greeting
+        string memory greeting,
+        address refundAddress
     ) public payable {
         uint256 cost = quoteCrossChainGreeting(targetChain);
         require(msg.value == cost);
@@ -39,7 +40,9 @@ contract HelloWormhole is IWormholeReceiver {
             targetAddress,
             abi.encode(greeting), // payload
             0, // no receiver value needed since we're just passing a message
-            GAS_LIMIT
+            GAS_LIMIT,
+            targetChain, // refund chain
+            refundAddress // refund address
         );
     }
 

@@ -91,7 +91,7 @@ contract HelloWorld {
     ) public payable {
         uint256 cost = quoteGreeting();
         require(msg.value == cost);
-				emit GreetingReceived(greeting, msg.sender);
+        emit GreetingReceived(greeting, msg.sender);
         greetings.push(greeting);
     }
 }
@@ -189,7 +189,7 @@ So, following this interface, we can implement `sendCrossChainGreeting` by simpl
     ) public payable {
         bytes memory payload = abi.encode(greeting);
         uint256 cost = quoteCrossChainGreeting(targetChain);
-	      require(msg.value >= cost);
+	    require(msg.value == cost, "Incorrect payment");
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             targetChain,
             targetAddress,
@@ -348,6 +348,7 @@ contract HelloWormhole is IWormholeReceiver {
         string memory greeting
     ) public payable {
         uint256 cost = quoteCrossChainGreeting(targetChain);
+        require(msg.value == cost, "Incorrect payment");
 
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             targetChain,
@@ -356,11 +357,6 @@ contract HelloWormhole is IWormholeReceiver {
             0, // no receiver value needed since we're just passing a message
             GAS_LIMIT
         );
-
-        if (msg.value > cost) {
-            (bool success, ) = msg.sender.call{value: msg.value - cost}("");
-            require(success, "Returning excess funds failed");
-        }
     }
 
     function receiveWormholeMessages(
