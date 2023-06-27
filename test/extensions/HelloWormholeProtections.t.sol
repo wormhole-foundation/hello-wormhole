@@ -25,11 +25,7 @@ contract HelloWormholeTest is WormholeRelayerTest {
 
         vm.recordLogs();
 
-        helloSource.sendCrossChainGreeting{value: cost}(
-            targetChain,
-            address(helloTarget),
-            "Hello Wormhole!"
-        );
+        helloSource.sendCrossChainGreeting{value: cost}(targetChain, address(helloTarget), "Hello Wormhole!");
 
         performDelivery();
 
@@ -38,16 +34,13 @@ contract HelloWormholeTest is WormholeRelayerTest {
     }
 
     function testGreetingFromWrongSender() public {
-
         HelloWormholeProtections fakeHelloSource = new HelloWormholeProtections(address(relayerSource));
         uint256 cost = fakeHelloSource.quoteCrossChainGreeting(targetChain);
 
         vm.recordLogs();
 
         fakeHelloSource.sendCrossChainGreeting{value: cost}(
-            targetChain,
-            address(helloTarget),
-            "Hello Wormhole from Fake Source!"
+            targetChain, address(helloTarget), "Hello Wormhole from Fake Source!"
         );
 
         performDelivery();

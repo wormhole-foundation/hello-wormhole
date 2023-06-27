@@ -24,11 +24,7 @@ contract HelloWormholeTest is WormholeRelayerTest {
 
         vm.recordLogs();
 
-        helloSource.sendCrossChainGreeting{value: cost}(
-            targetChain,
-            address(helloTarget),
-            "Hello Wormhole!"
-        );
+        helloSource.sendCrossChainGreeting{value: cost}(targetChain, address(helloTarget), "Hello Wormhole!");
 
         performDelivery();
 

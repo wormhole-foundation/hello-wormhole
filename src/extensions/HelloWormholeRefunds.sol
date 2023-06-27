@@ -17,14 +17,8 @@ contract HelloWormhole is IWormholeReceiver {
         wormholeRelayer = IWormholeRelayer(_wormholeRelayer);
     }
 
-    function quoteCrossChainGreeting(
-        uint16 targetChain
-    ) public view returns (uint256 cost) {
-        (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
-            targetChain,
-            0,
-            GAS_LIMIT
-        );
+    function quoteCrossChainGreeting(uint16 targetChain) public view returns (uint256 cost) {
+        (cost,) = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, 0, GAS_LIMIT);
     }
 
     function sendCrossChainGreeting(
@@ -57,16 +51,13 @@ contract HelloWormhole is IWormholeReceiver {
 
         latestGreeting = abi.decode(payload, (string));
 
-        emit GreetingReceived(
-            latestGreeting,
-            sourceChain,
-            fromWormholeFormat(sourceAddress)
-        );
+        emit GreetingReceived(latestGreeting, sourceChain, fromWormholeFormat(sourceAddress));
     }
 }
 
 function fromWormholeFormat(bytes32 whFormatAddress) pure returns (address) {
-    if (uint256(whFormatAddress) >> 160 != 0)
+    if (uint256(whFormatAddress) >> 160 != 0) {
         revert NotAnEvmAddress(whFormatAddress);
+    }
     return address(uint160(uint256(whFormatAddress)));
 }
