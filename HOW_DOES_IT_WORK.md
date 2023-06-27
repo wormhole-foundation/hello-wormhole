@@ -55,7 +55,7 @@ Delivery Providers are permissionless entities that help power the Wormhole Rela
 > - which calls the Wormhole Relayer contract’s ‘sendPayloadToEvm’,
 > - which publishes the delivery instructions to the blockchain logs and pays the default delivery provider
 
-### ******************************************************************************************Step 2: The Guardians create a signed VAAs******************************************************************************************
+### ******************************************************************************************Step 2: The Guardians create a signed VAA******************************************************************************************
 
 The wormhole protocol, at it’s core, is publishing messages from blockchains that are then signed by a quorum of 19 entities called the [Guardians](https://docs.wormhole.com/wormhole/explore-wormhole/guardian) to form signed VAAs. 
 
