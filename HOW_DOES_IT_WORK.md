@@ -35,10 +35,7 @@ This **********************************Wormhole Relayer*************************
 
 So in a smart contract on any of these chains, ‘sendPayloadToEvm’ can be called. 
 
-<aside>
-💡 Of note is that ‘sendPayloadToEvm’ must be called with a specific ‘msg.value’, specifically `(uint256 requiredMsgValue,) = quoteEVMDeliveryPrice(targetChain, receiverValue, gasLimit)`
-
-</aside>
+> Of note is that ‘sendPayloadToEvm’ must be called with a specific ‘msg.value’, specifically `(uint256 requiredMsgValue,) = quoteEVMDeliveryPrice(targetChain, receiverValue, gasLimit)`
 
 Calling this function will result in the **************************************************receiveWormholeMessages************************************************** endpoint on address ‘targetAddress’ on chain ‘targetChain’ to be invoked with a gas limit of ‘gasLimit’ and msg.value of ‘receiverValue’, and with the payload parameter being ‘payload’. 
 
@@ -72,10 +69,7 @@ Each Guardian watches the wormhole-connected blockchains and signs VAAs it sees.
 
 The Delivery Provider is likely running some form of the [Relayer Engine](https://github.com/wormhole-foundation/relayer-engine), watching the guardian network for signed VAAs containing wormhole messages from the Wormhole Relayer contract that indicate delivery instructions for them to execute on. 
 
-<aside>
-💡 The delivery instructions can even indicate fetching other VAAs ([see the sendVaasToEvm endpoint](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/relayer/IWormholeRelayer.sol#L119)!) This feature is useful for composing with other Wormhole protocols, such as TokenBridge
-
-</aside>
+> The delivery instructions can even indicate fetching other VAAs ([see the sendVaasToEvm endpoint](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/relayer/IWormholeRelayer.sol#L119)!) This feature is useful for composing with other Wormhole protocols, such as TokenBridge
 
 The Delivery Provider parses the delivery instruction it sees and obtains the following information:
 
@@ -102,10 +96,7 @@ The ‘deliver’ endpoint on the Wormhole Relayer contract, when called by the 
 
 A status event is then emitted to indicate whether this call succeeded or failed (and if it failed, the revert string is provided). 
 
-<aside>
-💡 To see the status of your delivery requests, use the ‘getWormholeRelayerInfo’ function in the Wormhole Javascript SDK - [see usage here](https://github.com/JoeHowarth/hello-wormhole/blob/main/ts-scripts/getStatus.ts). You can run this in HelloWormhole using `npm run status -- --tx TRANSACTION_HASH`
-
-</aside>
+> To see the status of your delivery requests, use the ‘getWormholeRelayerInfo’ function in the Wormhole Javascript SDK - [see usage here](https://github.com/JoeHowarth/hello-wormhole/blob/main/ts-scripts/getStatus.ts). You can run this in HelloWormhole using `npm run status -- --tx TRANSACTION_HASH`
 
 **In our scenario, (on the target chain)** 
 
