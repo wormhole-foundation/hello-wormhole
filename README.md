@@ -288,7 +288,11 @@ What will happen is, when on the source chain ‘sendPayloadToEvm’ is called, 
     }
 ```
 
-Note: Wormhole encodes EVM addresses into a bytes32 format, by left-padding them with zeroes. This is to allow for compatibility with other ecosystems that have 32-byte addresses. We use a helper 'fromWormholeFormat' here to take the sourceAddress (which is provided to us in bytes32 format) and discard the first 12 bytes.
+**Note 1: It is crucial that only the Wormhole Relayer contract can call receiveWormholeMessages**
+
+To be able to have any certainty about the validity of the payload, we must restrict the msg.sender of this function to only be the Wormhole Relayer contract. Otherwise, anyone could call this receiveWormholeMessages endpoint with fake greetings, source chains, and source senders. 
+
+**Note 2:** Wormhole encodes EVM addresses into a bytes32 format, by left-padding them with zeroes. This is to allow for compatibility with other ecosystems that have 32-byte addresses. We use a helper 'fromWormholeFormat' here to take the sourceAddress (which is provided to us in bytes32 format) and discard the first 12 bytes.
     
 ```solidity
     // Helper to convert 32-byte Wormhole formatted address to a standard EVM address
