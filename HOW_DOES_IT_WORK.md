@@ -14,7 +14,7 @@ To do this, we made use of the **********************************Wormhole Relaye
         uint256 gasLimit
     ) external payable returns (uint64 sequence);
 
-		function quoteEVMDeliveryPrice(
+    function quoteEVMDeliveryPrice(
         uint16 targetChain,
         uint256 receiverValue,
         uint256 gasLimit
@@ -51,24 +51,20 @@ The specific information that makes up this published message include instructio
 
 Delivery Providers are permissionless entities that help power the Wormhole Relayer network. If unspecified, your delivery request will be assigned to the default delivery provider. Each delivery provider is free to set it’s own pricing for how much it will charge for a relay to a specific chain with a specific receiverValue and gasLimit. The [full Wormhole Relayer interface](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/relayer/IWormholeRelayer.sol) provides endpoints where you can specify the delivery provider you wish to use
 
----
-**In our scenario,** 
+> **In our scenario,** 
+>
+> - a user of HelloWormhole calls ‘sendCrossChainGreeting’,
+> - which calls the Wormhole Relayer contract’s ‘sendPayloadToEvm’,
+> - which publishes the delivery instructions as a VAA and pays the default delivery provider
 
-- a user of HelloWormhole calls ‘sendCrossChainGreeting’,
-- which calls the Wormhole Relayer contract’s ‘sendPayloadToEvm’,
-- which publishes the delivery instructions as a VAA and pays the default delivery provider
----
 ### ******************************************************************************************Step 2: The Guardians sign VAAs******************************************************************************************
 
 The wormhole protocol, at it’s core, is publishing messages (VAAs) from blockchains that are signed by a quorum of 19 entities called the [Guardians](https://docs.wormhole.com/wormhole/explore-wormhole/guardian). 
 
 Each Guardian watches the wormhole-connected blockchains and signs VAAs it sees. Once a VAA obtains 13 of 19 signatures, it is considered fully signed. 
 
----
+> **In our scenario,** 13 of 19 guardians sign the delivery instructions VAA
 
-**In our scenario,** 13 of 19 guardians sign the delivery instructions VAA
-
----
 
 ### ******************************************************************************************Step 3: The Delivery Provider watches for signed VAAs containing deliveries that it has been assigned to, and (off chain!) parses the delivery instructions******************************************************************************************
 
@@ -85,13 +81,12 @@ The Delivery Provider parses the delivery instruction it sees and obtains the fo
 
 and then calls the `deliver` endpoint on the Wormhole Relayer contract on the target chain with the signed delivery instructions VAA and additional VAAs (and msg.value) as input. 
 
----
-**In our scenario,** 
+> **In our scenario,** 
+>
+> - The default delivery provider sees the delivery instructions VAA,
+> - parses the VAA off-chain to figure out the correct target chain
+> - and submits the VAA to the ‘deliver’ endpoint on the Wormhole Relayer contract on the target chain
 
-- The default delivery provider sees the delivery instructions VAA,
-- parses the VAA off-chain to figure out the correct target chain
-- and submits the VAA to the ‘deliver’ endpoint on the Wormhole Relayer contract on the target chain
----
 ### ******************************************************************************************Step 4: The Wormhole Relayer contract receives the delivery VAA, verifies the guardian signatures, and calls the receiveWormholeMessages() endpoint******************************************************************************************
 
 The ‘deliver’ endpoint on the Wormhole Relayer contract, when called by the delivery provider:
@@ -103,11 +98,12 @@ The ‘deliver’ endpoint on the Wormhole Relayer contract, when called by the 
 A status event is then emitted to indicate whether this call succeeded or failed (and if it failed, the revert string is provided). 
 
 > To see the status of your delivery requests, use the ‘getWormholeRelayerInfo’ function in the Wormhole Javascript SDK - [see usage here](https://github.com/JoeHowarth/hello-wormhole/blob/main/ts-scripts/getStatus.ts). You can run this in HelloWormhole using `npm run status -- --tx TRANSACTION_HASH`
----
-**In our scenario, (on the target chain)** 
 
-- The Wormhole Relayer contract verifies the signatures on the delivery VAA,
-- and then parses the VAA to figure out the correct target address (which is our HelloWormhole contract on this chain), payload, and gas limit
-- and submits the payload to the ‘receiveWormholeMessages’ endpoint of our HelloWormhole contract
-- ..and then our HelloWormhole contract on the target chain does the rest!
----
+
+
+> **In our scenario, (on the target chain)** 
+>
+>- The Wormhole Relayer contract verifies the signatures on the delivery VAA,
+>- and then parses the VAA to figure out the correct target address (which is our HelloWormhole contract on this chain), payload, and gas limit
+>- and submits the payload to the ‘receiveWormholeMessages’ endpoint of our HelloWormhole contract
+>- ..and then our HelloWormhole contract on the target chain does the rest!
