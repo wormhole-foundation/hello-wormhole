@@ -28,7 +28,7 @@ Often, it is desirable that all of the requests go through your own source contr
 ****************Solution:**************** We can check, in our implementation of receiveWormholeMessages, that ‘sourceChain’ and ‘sourceAddress’ are a valid HelloWormhole contract, and revert otherwise
 
 ```solidity
-	address registrationOwner;
+    address registrationOwner;
     mapping(uint16 => bytes32) registeredSenders;
 
 		modifier isRegisteredSender(uint16 sourceChain, bytes32 sourceAddress) {
