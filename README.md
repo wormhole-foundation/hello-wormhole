@@ -310,9 +310,9 @@ Users with any wallet can request greetings to be emitted on any chain that is p
 
 ### How does it work?
 
-[Check out Part 2](HOW_DOES_IT_WORK.md) for an in-depth explanation of how Wormhole Relayer causes contracts on other blockchains to be called with the appropriate inputs!
+[Check out Part 2](./hello-wormhole-explained.md) for an in-depth explanation of how Wormhole Relayer causes contracts on other blockchains to be called with the appropriate inputs!
 
 ### Full Cross-chain HelloWormhole solidity contract
 
-**Full Github Repository with Testing infrastructure here: [https://github.com/JoeHowarth/hello-wormhole/blob/main/src/HelloWormhole.sol](https://github.com/JoeHowarth/hello-wormhole/blob/main/src/HelloWormhole.sol)**
+Full Github Repository with Testing infrastructure [here](https://github.com/wormhole-foundation/hello-wormhole/)
 
