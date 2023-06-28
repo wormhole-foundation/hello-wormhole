@@ -4,10 +4,11 @@ pragma solidity ^0.8.13;
 import "wormhole-relayer-sdk/interfaces/IWormholeRelayer.sol";
 import "wormhole-relayer-sdk/interfaces/IWormholeReceiver.sol";
 
-contract HelloWormhole is IWormholeReceiver {
+contract HelloWormholeRefunds is IWormholeReceiver {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
 
-    uint256 constant GAS_LIMIT = 50_000;
+    // Way too much gas, for purpose of illustrating refund
+    uint256 constant GAS_LIMIT = 500_000;
 
     IWormholeRelayer public immutable wormholeRelayer;
 
@@ -21,10 +22,15 @@ contract HelloWormhole is IWormholeReceiver {
         (cost,) = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, 0, GAS_LIMIT);
     }
 
+    function quoteCrossChainGreetingRefundPerUnitGasUnused(uint16 targetChain) public view returns (uint256 refundPerUnitGasUnused) {
+        (, refundPerUnitGasUnused) = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, 0, GAS_LIMIT);
+    }
+
     function sendCrossChainGreeting(
         uint16 targetChain,
         address targetAddress,
         string memory greeting,
+        uint16 refundChain,
         address refundAddress
     ) public payable {
         uint256 cost = quoteCrossChainGreeting(targetChain);
@@ -35,8 +41,8 @@ contract HelloWormhole is IWormholeReceiver {
             abi.encode(greeting), // payload
             0, // no receiver value needed since we're just passing a message
             GAS_LIMIT,
-            targetChain, // refund chain
-            refundAddress // refund address
+            refundChain, 
+            refundAddress 
         );
     }
 
