@@ -288,7 +288,7 @@ What will happen is, when on the source chain ‘sendPayloadToEvm’ is called, 
     }
 ```
 
-**Note 1:** It is crucial that only the Wormhole Relayer contract can call receiveWormholeMessages**
+**Note 1:** It is crucial that only the Wormhole Relayer contract can call receiveWormholeMessages
 
 To be able to have any certainty about the validity of the payload, we must restrict the msg.sender of this function to only be the Wormhole Relayer contract. Otherwise, anyone could call this receiveWormholeMessages endpoint with fake greetings, source chains, and source senders. 
 
