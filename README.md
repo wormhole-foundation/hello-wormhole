@@ -1,6 +1,6 @@
 # Building Your First Cross-Chain Application
 
-[This repository contains a solidity contract (HelloWormhole.sol) that can be deployed onto many EVM chains to form a fully functioning cross-chain application](./README.md).
+[This repository](./README.md) contains a solidity contract (HelloWormhole.sol) that can be deployed onto many EVM chains to form a fully functioning cross-chain application.
 
 Specifically, we will write and deploy a contract onto many chains that allows users to request, from one contract, for a GreetingReceived event to be emitted from one of the other contracts on a different chain. 
 
