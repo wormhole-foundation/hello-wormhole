@@ -151,7 +151,7 @@ function quoteEVMDeliveryPrice(
 targetChainWormholeRelayer.quoteNativeForChain(refundChain, TARGET_CHAIN_REFUND - BASE_COST, deliveryProviderAddress)
 ```
 
-******************************************note: deliveryProviderAddress here is equal to targetChainWormholeRelayer.quoteDefaultDeliveryProvider()****************************************** 
+***note: deliveryProviderAddress here is equal to targetChainWormholeRelayer.quoteDefaultDeliveryProvider()***
 
 Included in the HelloWormhole repository is an [example contract](https://github.com/wormhole-foundation/hello-wormhole/blob/main/src/extensions/HelloWormholeRefunds.sol) (and [forge tests](https://github.com/wormhole-foundation/hello-wormhole/blob/main/test/extensions/HelloWormholeRefunds.t.sol)) that use this refund feature.
 
