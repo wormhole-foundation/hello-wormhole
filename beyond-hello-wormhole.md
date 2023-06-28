@@ -1,8 +1,8 @@
 # Beyond HelloWormhole - Protections, Refunds, Forwarding, and More
 
-In Part 1 ([HelloWormhole](https://github.com/JoeHowarth/hello-wormhole/)), we wrote a fully functioning cross-chain application that allows users to request, from one contract, for a GreetingReceived event to be emitted from one of the other contracts on a different chain. 
+In Part 1 ([HelloWormhole](https://github.com/wormhole-foundation/hello-wormhole/)), we wrote a fully functioning cross-chain application that allows users to request, from one contract, for a GreetingReceived event to be emitted from one of the other contracts on a different chain. 
 
-In Part 2 ([How does Hello Wormhole Work?](https://github.com/JoeHowarth/hello-wormhole/blob/main/HOW_DOES_IT_WORK.md)), we discuss how the Wormhole Relayer contract works behind the scenes - it works by publishing a wormhole message with delivery instructions, which alerts a delivery provider to call the ‘deliver’ endpoint of the Wormhole Relayer contract on the target chain, which then calls the desired targetAddress with the correct inputs
+In Part 2 ([How does Hello Wormhole Work?](https://github.com/wormhole-foundation/hello-wormhole/blob/main/HOW_DOES_IT_WORK.md)), we discuss how the Wormhole Relayer contract works behind the scenes - it works by publishing a wormhole message with delivery instructions, which alerts a delivery provider to call the ‘deliver’ endpoint of the Wormhole Relayer contract on the target chain, which then calls the desired targetAddress with the correct inputs
 
 HelloWormhole is a great example application, but has much room for improvement. Let’s talk through some ways to improve both the security and features of the application!
 
@@ -91,7 +91,7 @@ We provide a base class in the [Wormhole Solidity SDK](https://github.com/wormho
     }
 ```
 
-Included in the HelloWormhole repository is an [example contract](https://github.com/JoeHowarth/hello-wormhole/blob/main/src/extensions/HelloWormholeProtections.sol) (and [forge tests](https://github.com/JoeHowarth/hello-wormhole/blob/main/test/extensions/HelloWormholeProtections.t.sol)) that uses these helpers: 
+Included in the HelloWormhole repository is an [example contract](https://github.com/wormhole-foundation/hello-wormhole/blob/main/src/extensions/HelloWormholeProtections.sol) (and [forge tests](https://github.com/wormhole-foundation/hello-wormhole/blob/main/test/extensions/HelloWormholeProtections.t.sol)) that uses these helpers: 
 
 You can add these helpers into your own project as such:
 
@@ -153,7 +153,7 @@ targetChainWormholeRelayer.quoteNativeForChain(refundChain, TARGET_CHAIN_REFUND 
 
 ******************************************note: deliveryProviderAddress here is equal to targetChainWormholeRelayer.quoteDefaultDeliveryProvider()****************************************** 
 
-Included in the HelloWormhole repository is an [example contract](https://github.com/JoeHowarth/hello-wormhole/blob/main/src/extensions/HelloWormholeRefunds.sol) (and [forge tests](https://github.com/JoeHowarth/hello-wormhole/blob/main/test/extensions/HelloWormholeRefunds.t.sol)) that use this refund feature.
+Included in the HelloWormhole repository is an [example contract](https://github.com/wormhole-foundation/hello-wormhole/blob/main/src/extensions/HelloWormholeRefunds.sol) (and [forge tests](https://github.com/wormhole-foundation/hello-wormhole/blob/main/test/extensions/HelloWormholeRefunds.t.sol)) that use this refund feature.
 
 ## Feature: Forwarding - going from chain A → chain B → chain C
 
