@@ -141,11 +141,11 @@ function quoteEVMDeliveryPrice(
 ) external view returns (uint256 nativePriceQuote, uint256 targetChainRefundPerGasUnused);
 ```
 
-********************else (if refundChain is not equal to targetChain)********************, then 
+**else** (if refundChain is not equal to targetChain), then 
 
 1) the cost to perform a delivery with a gas limit and receiver value of 0 to the refund chain will be calculated (let’s call it BASE_COST)
 
-2) ***************************************************if*************************************************** `TARGET_CHAIN_REFUND = targetChainRefundPerGasUnused * (gasLimit - gasUsed)` ***************************************************is larger than BASE_COST***************************************************, then a delivery will be performed, and the msg.value that will be sent to ‘refundAddress’ on ‘refundChain’ will be
+2) ***if*** `TARGET_CHAIN_REFUND = targetChainRefundPerGasUnused * (gasLimit - gasUsed)` ***is larger than BASE_COST***, then a delivery will be performed, and the msg.value that will be sent to ‘refundAddress’ on ‘refundChain’ will be
 
 ```solidity
 targetChainWormholeRelayer.quoteNativeForChain(refundChain, TARGET_CHAIN_REFUND - BASE_COST, deliveryProviderAddress)
