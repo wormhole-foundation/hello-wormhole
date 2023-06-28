@@ -1,6 +1,6 @@
 # How does HelloWormhole Work?
 
-In Part 1 ([HelloWormhole](https://github.com/JoeHowarth/hello-wormhole/)), we wrote a fully functioning cross-chain application that allows users to request, from one contract, for a GreetingReceived event to be emitted from one of the other contracts on a different chain. 
+In Part 1 ([HelloWormhole](./README.md)), we wrote a fully functioning cross-chain application that allows users to request, from one contract, for a GreetingReceived event to be emitted from one of the other contracts on a different chain. 
 
 To do this, we made use of the **********************************Wormhole Relayer********************************** contract ([full interface](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/relayer/IWormholeRelayer.sol), [implementation](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/relayer/wormholeRelayer/WormholeRelayer.sol)); specifically the following functions
 
@@ -95,7 +95,7 @@ The ‘deliver’ endpoint on the Wormhole Relayer contract, when called by the 
 
 A status event is then emitted to indicate whether this call succeeded or failed (and if it failed, the revert string is provided). 
 
-> To see the status of your delivery requests, use the ‘getWormholeRelayerInfo’ function in the Wormhole Javascript SDK - [see usage here](https://github.com/JoeHowarth/hello-wormhole/blob/main/ts-scripts/getStatus.ts). You can run this in HelloWormhole using `npm run status -- --tx TRANSACTION_HASH`
+> To see the status of your delivery requests, use the ‘getWormholeRelayerInfo’ function in the Wormhole Javascript SDK - [see usage here](https://github.com/wormhole-foundation/hello-wormhole/blob/main/ts-scripts/getStatus.ts). You can run this in HelloWormhole using `npm run status -- --tx TRANSACTION_HASH`
 
 
 
