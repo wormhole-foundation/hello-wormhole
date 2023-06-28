@@ -31,7 +31,7 @@ Often, it is desirable that all of the requests go through your own source contr
     address registrationOwner;
     mapping(uint16 => bytes32) registeredSenders;
 
-		modifier isRegisteredSender(uint16 sourceChain, bytes32 sourceAddress) {
+    modifier isRegisteredSender(uint16 sourceChain, bytes32 sourceAddress) {
         require(registeredSenders[sourceChain] == sourceAddress, "Not registered sender");
         _;
     }
@@ -57,7 +57,7 @@ Anyone can fetch the delivery VAA corresponding to a sent greeting, and have it 
 
 ```solidity
 
-		mapping(bytes32 => bool) seenDeliveryVaaHashes;
+    mapping(bytes32 => bool) seenDeliveryVaaHashes;
 
     modifier replayProtect(bytes32 deliveryHash) {
         require(!seenDeliveryVaaHashes[deliveryHash], "Message already processed");
