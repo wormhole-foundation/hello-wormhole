@@ -1,14 +1,14 @@
 # Building Your First Cross-Chain Application
 
-[This repository](./README.md) contains a solidity contract (HelloWormhole.sol) that can be deployed onto many EVM chains to form a fully functioning cross-chain application.
+This tutorial contains a solidity contract (`HelloWormhole.sol`) that can be deployed onto many EVM chains to form a fully functioning cross-chain application.
 
-Specifically, we will write and deploy a contract onto many chains that allows users to request, from one contract, for a GreetingReceived event to be emitted from one of the other contracts on a different chain. 
+Specifically, we will write and deploy a contract onto many chains that allows users to request, from one contract, that a `GreetingReceived` event be emitted from a contracts on a _different chain_. 
 
-This allows users to pay for their custom greeting to be emitted on a chain that they do not have any gas funds for! 
+This also allows users to pay for their custom greeting to be emitted on a chain that they do not have any gas funds for! 
 
 ## Getting Started
 
-Included in this repository is:
+Included in the [repository](https://github.com/wormhole-foundation/hello-wormhole) is:
 
 - Example Solidity Code
 - Example Forge local testing setup
@@ -22,7 +22,11 @@ Included in this repository is:
 
 ### Testing Locally
 
+Pull the code down from github and cd into the directory, then build and test it.
+
 ```bash
+git clone https://github.com/wormhole-foundation/hello-wormhole.git
+cd hello-wormhole
 npm run build
 forge test
 ```
@@ -64,7 +68,7 @@ Let’s take a simple HelloWorld solidity application, and take it cross-chain!
 
 ### Single-chain HelloWorld solidity contract
 
-This single-chain HelloWorld smart contract allows users to send greetings, a.k.a allows them to cause an event ‘GreetingReceived’ to be emitted with their greeting!
+This single-chain HelloWorld smart contract allows users to send greetings. In other words, it allows them to cause an event `GreetingReceived` to be emitted with their greeting!
 
 ```solidity
 // SPDX-License-Identifier: UNLICENSED
@@ -99,9 +103,11 @@ contract HelloWorld {
 
 ### Taking HelloWorld cross-chain using Wormhole Automatic Relayers
 
-Suppose we want users to be able to request through their Ethereum wallet for a greeting to be sent to Avalanche, and vice versa. Let us begin writing a contract that we can deploy onto Ethereum, Avalanche, and any number of other chains, and enable greetings to be sent freely to and from each contract irrespective of chain. 
+Suppose we want users to be able to request, through their Ethereum wallet, that a greeting be sent to Avalanche, and vice versa. 
 
-We’d want to implement the following function: 
+Let us begin writing a contract that we can deploy onto Ethereum, Avalanche, or any number of other chains, to enable greetings be sent freely between each contract, irrespective of chain. 
+
+We'll want to implement the following function: 
 
 ```solidity
     /**
@@ -148,11 +154,13 @@ The Wormhole Relayer contract lets us do exactly this! Let’s take a look at th
     ) external payable returns (uint64 sequence);
 ```
 
-The Wormhole Relayer network is powered by ******************Delivery Providers******************, who perform the service of watching for Wormhole Relayer delivery requests and performing the delivery to the intended target chain as instructed. 
+The Wormhole Relayer network is powered by **Delivery Providers**, who perform the service of watching for Wormhole Relayer delivery requests and performing the delivery to the intended target chain as instructed. 
 
-In exchange for calling your contract at ‘targetAddress’ on ‘targetChain’ and paying the gas fees that your contract uses up, they charge a source chain fee of 
+In exchange for calling your contract at `targetAddress` on `targetChain` and paying the gas fees that your contract consumes, they charge a source chain fee. The fee charged will depend on the conditions of the target network and the fee can be requested from the delivery provider:
 
-`(deliveryPrice,) = quoteEVMDeliveryPrice(targetChain, receiverValue, gasLimit)`
+```
+(deliveryPrice,) = quoteEVMDeliveryPrice(targetChain, receiverValue, gasLimit)
+```
 
 So, following this interface, we can implement `sendCrossChainGreeting` by simply calling sendPayloadToEvm with the payload being the greeting.
 
@@ -201,7 +209,9 @@ So, following this interface, we can implement `sendCrossChainGreeting` by simpl
 
 ```
 
-A key part of this system though is that ‘targetAddress’ must implement the IWormholeReceiver interface! Since we want to be able to send both to and from the HelloWormhole contract, we must implement this interface. 
+A key part of this system, though, is that the contract at the `targetAddress` must implement the `IWormholeReceiver` interface. 
+
+Since we want to allow sending and receiving messages by the `HelloWormhole` contract, we must implement this interface. 
 
 ```solidity
 // SPDX-License-Identifier: Apache 2
@@ -255,10 +265,12 @@ interface IWormholeReceiver {
 }
 ```
 
-What will happen is, when on the source chain ‘sendPayloadToEvm’ is called, the  Delivery Provider will watch the source chain and then call the ‘receiveWormholeMessages’ endpoint on the targetChain and targetAddress specified. So, in receiveWormholeMessages, we want to 
+After `sendPayloadToEvm` is called on the source chain, the off-chain Delivery Provider will pick up the VAA corresponding to the message. It will then call the `receiveWormholeMessages` method on the `targetChain` and `targetAddress` specified. 
 
-- Update the latest greeting
-- Emit a 'GreetingReceived' event with the 'greeting'
+So, in receiveWormholeMessages, we want to:
+
+1) Update the latest greeting
+2) Emit a 'GreetingReceived' event with the 'greeting'
 
 ```solidity
 	event GreetingReceived(string greeting, uint16 senderChain, address sender);
@@ -288,11 +300,12 @@ What will happen is, when on the source chain ‘sendPayloadToEvm’ is called, 
     }
 ```
 
-**Note 1:** It is crucial that only the Wormhole Relayer contract can call receiveWormholeMessages
+> Note: It is crucial that only the Wormhole Relayer contract can call receiveWormholeMessages
 
-To be able to have any certainty about the validity of the payload, we must restrict the msg.sender of this function to only be the Wormhole Relayer contract. Otherwise, anyone could call this receiveWormholeMessages endpoint with fake greetings, source chains, and source senders. 
+To provide certainty about the validity of the payload, we must restrict the msg.sender of this function to only be the Wormhole Relayer contract. Otherwise, anyone could call this receiveWormholeMessages endpoint with fake greetings, source chains, and source senders. 
 
-**Note 2:** Wormhole left-pads EVM addresses into a bytes32 format, to allow for compatibility with ecosystems that don't have 20-byte addresses. We use a helper 'fromWormholeFormat' here to obtain the address in 20-byte format (discarding the first 12 bytes).
+> Note: Wormhole left-pads EVM addresses into a bytes32 format, to allow for compatibility with ecosystems that don't have 20-byte addresses. We use a helper 'fromWormholeFormat' here to obtain the address in 20-byte format (discarding the first 12 bytes).
+> See [this page](https://docs.wormhole.com/wormhole/reference/environments/evm#addresses) for more details.
     
 ```solidity
     // Helper to convert 32-byte Wormhole formatted address to a standard EVM address
