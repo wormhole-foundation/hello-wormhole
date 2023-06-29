@@ -314,5 +314,5 @@ Users with any wallet can request greetings to be emitted on any chain that is p
 
 ### Full Cross-chain HelloWormhole solidity contract
 
-Full Github Repository with Testing infrastructure [here](https://github.com/wormhole-foundation/hello-wormhole/)
+See the [full implementation of the HelloWormhole.sol contract](https://github.com/wormhole-foundation/hello-wormhole/blob/main/src/HelloWormhole.sol) and the [full Github repository with testing infrastructure](https://github.com/wormhole-foundation/hello-wormhole/)
 
