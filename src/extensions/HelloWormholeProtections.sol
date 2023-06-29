@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "wormhole-relayer-sdk/interfaces/IWormholeRelayer.sol";
-import "wormhole-relayer-sdk/interfaces/IWormholeReceiver.sol";
-import "wormhole-relayer-sdk/WormholeRelayerSDK.sol";
+import "wormhole-solidity-sdk/interfaces/IWormholeRelayer.sol";
+import "wormhole-solidity-sdk/interfaces/IWormholeReceiver.sol";
+import "wormhole-solidity-sdk/WormholeRelayerSDK.sol";
 
 contract HelloWormholeProtections is Base, IWormholeReceiver {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);

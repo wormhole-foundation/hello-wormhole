@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import "../../src/extensions/HelloWormholeRefunds.sol";
 
-import "wormhole-relayer-sdk/testing/WormholeRelayerTest.sol";
+import "wormhole-solidity-sdk/testing/WormholeRelayerTest.sol";
 
 contract HelloWormholeRefundsTest is WormholeRelayerTest {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);

@@ -33,7 +33,6 @@ describe("Hello Wormhole Integration Tests on Testnet", () => {
 
         /*
         console.log("Checking relay status");
-        console.log(CHAIN_ID_TO_NAME[sourceChain]);
         const res = await getStatus(CHAIN_ID_TO_NAME[sourceChain], tx.hash);
         console.log(`Status: ${res.status}`);
         console.log(`Info: ${res.info}`); */

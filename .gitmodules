@@ -1,6 +1,6 @@
 [submodule "lib/forge-std"]
 	path = lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
-[submodule "lib/wormhole-relayer-sdk"]
-	path = lib/wormhole-relayer-sdk
-	url = https://github.com/JoeHowarth/wormhole-relayer-sdk
+[submodule "lib/wormhole-solidity-sdk"]
+	path = lib/wormhole-solidity-sdk
+	url = https://github.com/wormhole-foundation/wormhole-solidity-sdk
