@@ -17,14 +17,8 @@ contract HelloWormhole is IWormholeReceiver {
         wormholeRelayer = IWormholeRelayer(_wormholeRelayer);
     }
 
-    function quoteCrossChainGreeting(uint16 targetChain) public view returns (uint256 cost) {
-        (cost,) = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, 0, GAS_LIMIT);
-    }
-
     function sendCrossChainGreeting(uint16 targetChain, address targetAddress, string memory greeting) public payable {
-        uint256 cost = quoteCrossChainGreeting(targetChain);
-        require(msg.value == cost);
-        wormholeRelayer.sendPayloadToEvm{value: cost}(
+        wormholeRelayer.sendPayloadToEvm(
             targetChain,
             targetAddress,
             abi.encode(greeting), // payload
