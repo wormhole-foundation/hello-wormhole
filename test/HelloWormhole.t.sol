@@ -19,7 +19,7 @@ contract HelloWormholeTest is WormholeRelayerTest {
         helloTarget = new HelloWormhole(address(relayerTarget));
     }
 
-    function testGreeting() public {
+    function testGreeting_Step1() public {
 
         bytes32 sourceAddress = toWormholeFormat(address(helloSource));
         address sender = address(this);
