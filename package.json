@@ -2,9 +2,9 @@
   "name": "hello-wormhole",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "git@github.com:JoeHowarth/hello-wormhole.git",
-  "author": "Joe Howarth <josephehowarth@gmail.com>",
-  "license": "MIT",
+  "repository": "git@github.com:wormhole-foundation/hello-wormhole.git",
+  "author": "Wormhole Contributors",
+  "license": "Apache 2.0",
   "scripts": {
     "main": "ts-node ./ts-scripts/main.ts",
     "deploy": "npm run build; ts-node ./ts-scripts/main.ts deploy",
