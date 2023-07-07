@@ -22,15 +22,15 @@ contract HelloWormholeTest is WormholeRelayerTest {
     function testGreeting() public {
 
         bytes32 sourceAddress = toWormholeFormat(address(helloSource));
+        address sender = address(this);
 
         vm.selectFork(targetFork);
 
-        vm.expectEmit();
-
-        emit GreetingReceived("Hello Wormhole!", sourceChain, address(0x0));
+        vm.expectEmit(true, true, true, true, address(helloTarget));
+        emit GreetingReceived("Hello Wormhole!", sourceChain, sender);
         vm.prank(address(relayerTarget));
         helloTarget.receiveWormholeMessages(
-            abi.encode("Hello Wormhole!"),
+            abi.encode("Hello Wormhole!", sender),
             new bytes[](0),
             sourceAddress,
             sourceChain,

@@ -15,24 +15,26 @@ contract HelloWormhole is IWormholeReceiver {
         wormholeRelayer = IWormholeRelayer(_wormholeRelayer);
     }
 
+    /**
+     * receiveWormholeMessages should 
+     * 1) update 'latestGreeting' to be the sent greeting
+     * 2) cause a GreetingReceived event to be emitted
+     * with the sent greeting, senderChain, and sender
+     * 
+     * Only 'wormholeRelayer' should be allowed to call this method
+     * 
+     * @param payload This will be 'abi.encode(greeting, sender)'
+     * @param sourceChain This is the chain from which the payload was sent
+     */
     function receiveWormholeMessages(
         bytes memory payload,
         bytes[] memory, // additionalVaas
-        bytes32 sourceAddress,
+        bytes32, // address that requested the sending of the payload
         uint16 sourceChain,
         bytes32 // deliveryHash
     ) public payable override {
-        require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
-
-        latestGreeting = abi.decode(payload, (string));
-
-        emit GreetingReceived(latestGreeting, sourceChain, fromWormholeFormat(sourceAddress));
+        // implement this function!
+        // run 'forge test' to test your implementation
+        
     }
-}
-
-function fromWormholeFormat(bytes32 whFormatAddress) pure returns (address) {
-    if (uint256(whFormatAddress) >> 160 != 0) {
-        revert NotAnEvmAddress(whFormatAddress);
-    }
-    return address(uint160(uint256(whFormatAddress)));
 }
