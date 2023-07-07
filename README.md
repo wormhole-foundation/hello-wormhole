@@ -273,7 +273,7 @@ So, in receiveWormholeMessages, we want to:
 2) Emit a 'GreetingReceived' event with the 'greeting' and sender of the greeting
 
 ```solidity
-	event GreetingReceived(string greeting, uint16 senderChain, address sender);
+    event GreetingReceived(string greeting, uint16 senderChain, address sender);
 
     string public latestGreeting;
 
