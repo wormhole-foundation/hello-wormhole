@@ -15,17 +15,19 @@ contract HelloWormhole is IWormholeReceiver {
         wormholeRelayer = IWormholeRelayer(_wormholeRelayer);
     }
 
-    /**
-     * receiveWormholeMessages should 
-     * 1) update 'latestGreeting' to be the sent greeting
-     * 2) cause a GreetingReceived event to be emitted
-     * with the sent greeting, senderChain, and sender
-     * 
-     * Only 'wormholeRelayer' should be allowed to call this method
-     * 
-     * @param payload This will be 'abi.encode(greeting, sender)'
-     * @param sourceChain This is the chain from which the payload was sent
-     */
+    function quoteCrossChainGreeting(uint16 targetChain) public view returns (uint256 cost) {
+        // Use a function on the IWormholeRelayer interface to return the msg.value needed to call sendCrossChainGreeting!
+        cost = 0;
+    }
+
+    function sendCrossChainGreeting(uint16 targetChain, address targetAddress, string memory greeting) public payable {
+        uint256 cost = quoteCrossChainGreeting(targetChain);
+        require(msg.value == cost);
+        
+        // Use a function on the IWormholeRelayer interface to cause 'receiveWormholeMessages' (which is on a different blockchain!)
+        // to be called in the intended way
+    }
+
     function receiveWormholeMessages(
         bytes memory payload,
         bytes[] memory, // additionalVaas
@@ -33,8 +35,12 @@ contract HelloWormhole is IWormholeReceiver {
         uint16 sourceChain,
         bytes32 // deliveryHash
     ) public payable override {
-        // implement this function!
-        // run 'forge test' to test your implementation
-        
+        require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
+
+        (string memory greeting, address sender) = abi.decode(payload, (string, address));
+
+        latestGreeting = greeting;
+
+        emit GreetingReceived(greeting, sourceChain, sender);
     }
 }

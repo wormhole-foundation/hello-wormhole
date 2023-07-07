@@ -19,7 +19,7 @@ contract HelloWormholeTest is WormholeRelayerTest {
         helloTarget = new HelloWormhole(address(relayerTarget));
     }
 
-    function testGreeting() public {
+    function testGreeting_Step1() public {
 
         bytes32 sourceAddress = toWormholeFormat(address(helloSource));
         address sender = address(this);
@@ -37,6 +37,20 @@ contract HelloWormholeTest is WormholeRelayerTest {
             keccak256("Arbitrary Delivery Hash")
         );
 
+        assertEq(helloTarget.latestGreeting(), "Hello Wormhole!");
+    }
+
+    function testGreeting_Complete() public {
+
+        uint256 cost = helloSource.quoteCrossChainGreeting(targetChain);
+
+        vm.recordLogs();
+
+        helloSource.sendCrossChainGreeting{value: cost}(targetChain, address(helloTarget), "Hello Wormhole!");
+
+        performDelivery();
+
+        vm.selectFork(targetFork);
         assertEq(helloTarget.latestGreeting(), "Hello Wormhole!");
     }
 }
