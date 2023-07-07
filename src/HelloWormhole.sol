@@ -7,30 +7,12 @@ import "wormhole-solidity-sdk/interfaces/IWormholeReceiver.sol";
 contract HelloWormhole is IWormholeReceiver {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
 
-    uint256 constant GAS_LIMIT = 50_000;
-
     IWormholeRelayer public immutable wormholeRelayer;
 
     string public latestGreeting;
 
     constructor(address _wormholeRelayer) {
         wormholeRelayer = IWormholeRelayer(_wormholeRelayer);
-    }
-
-    function quoteCrossChainGreeting(uint16 targetChain) public view returns (uint256 cost) {
-        (cost,) = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, 0, GAS_LIMIT);
-    }
-
-    function sendCrossChainGreeting(uint16 targetChain, address targetAddress, string memory greeting) public payable {
-        uint256 cost = quoteCrossChainGreeting(targetChain);
-        require(msg.value == cost);
-        wormholeRelayer.sendPayloadToEvm{value: cost}(
-            targetChain,
-            targetAddress,
-            abi.encode(greeting), // payload
-            0, // no receiver value needed since we're just passing a message
-            GAS_LIMIT
-        );
     }
 
     function receiveWormholeMessages(
