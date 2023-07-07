@@ -38,7 +38,7 @@ contract HelloWormholeRefunds is IWormholeReceiver {
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             targetChain,
             targetAddress,
-            abi.encode(greeting), // payload
+            abi.encode(greeting, msg.sender), // payload
             0, // no receiver value needed since we're just passing a message
             GAS_LIMIT,
             refundChain, 
@@ -49,21 +49,15 @@ contract HelloWormholeRefunds is IWormholeReceiver {
     function receiveWormholeMessages(
         bytes memory payload,
         bytes[] memory, // additionalVaas
-        bytes32 sourceAddress,
+        bytes32, // address that called 'sendPayloadToEvm' (HelloWormholeRefunds contract address)
         uint16 sourceChain,
         bytes32 // deliveryHash
     ) public payable override {
         require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
 
-        latestGreeting = abi.decode(payload, (string));
+        (string memory greeting, address sender) = abi.decode(payload, (string, address));
+        latestGreeting = greeting;
 
-        emit GreetingReceived(latestGreeting, sourceChain, fromWormholeFormat(sourceAddress));
+        emit GreetingReceived(latestGreeting, sourceChain, sender);
     }
-}
-
-function fromWormholeFormat(bytes32 whFormatAddress) pure returns (address) {
-    if (uint256(whFormatAddress) >> 160 != 0) {
-        revert NotAnEvmAddress(whFormatAddress);
-    }
-    return address(uint160(uint256(whFormatAddress)));
 }

@@ -24,7 +24,7 @@ contract HelloWormholeProtections is Base, IWormholeReceiver {
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             targetChain,
             targetAddress,
-            abi.encode(greeting), // payload
+            abi.encode(greeting, msg.sender), // payload
             0, // no receiver value needed since we're just passing a message
             GAS_LIMIT
         );
@@ -44,8 +44,9 @@ contract HelloWormholeProtections is Base, IWormholeReceiver {
         isRegisteredSender(sourceChain, sourceAddress)
         replayProtect(deliveryHash)
     {
-        latestGreeting = abi.decode(payload, (string));
+        (string memory greeting, address sender) = abi.decode(payload, (string, address));
+        latestGreeting = greeting;
 
-        emit GreetingReceived(latestGreeting, sourceChain, fromWormholeFormat(sourceAddress));
+        emit GreetingReceived(latestGreeting, sourceChain, sender);
     }
 }

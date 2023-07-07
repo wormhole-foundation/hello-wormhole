@@ -162,7 +162,7 @@ In exchange for calling your contract at `targetAddress` on `targetChain` and pa
 (deliveryPrice,) = quoteEVMDeliveryPrice(targetChain, receiverValue, gasLimit)
 ```
 
-So, following this interface, we can implement `sendCrossChainGreeting` by simply calling sendPayloadToEvm with the payload being the greeting.
+So, following this interface, we can implement `sendCrossChainGreeting` by simply calling sendPayloadToEvm with the payload being some information we'd like to send, such as the greeting and the sender of the greeting.
 
 ```solidity
     uint256 constant GAS_LIMIT = 50_000;
@@ -195,7 +195,7 @@ So, following this interface, we can implement `sendCrossChainGreeting` by simpl
         address targetAddress,
         string memory greeting
     ) public payable {
-        bytes memory payload = abi.encode(greeting);
+        bytes memory payload = abi.encode(greeting, msg.sender);
         uint256 cost = quoteCrossChainGreeting(targetChain);
 	    require(msg.value == cost, "Incorrect payment");
         wormholeRelayer.sendPayloadToEvm{value: cost}(
@@ -270,7 +270,7 @@ After `sendPayloadToEvm` is called on the source chain, the off-chain Delivery P
 So, in receiveWormholeMessages, we want to:
 
 1) Update the latest greeting
-2) Emit a 'GreetingReceived' event with the 'greeting'
+2) Emit a 'GreetingReceived' event with the 'greeting' and sender of the greeting
 
 ```solidity
 	event GreetingReceived(string greeting, uint16 senderChain, address sender);
@@ -290,7 +290,9 @@ So, in receiveWormholeMessages, we want to:
     ) public payable override {
         require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
 
-        latestGreeting = abi.decode(payload, (string));
+        (string memory greeting, address sender) = abi.decode(payload, (string, address));
+
+        latestGreeting = greeting;
 
         emit GreetingReceived(
             latestGreeting,
@@ -304,19 +306,6 @@ So, in receiveWormholeMessages, we want to:
 
 To provide certainty about the validity of the payload, we must restrict the msg.sender of this function to only be the Wormhole Relayer contract. Otherwise, anyone could call this receiveWormholeMessages endpoint with fake greetings, source chains, and source senders. 
 
-> Note: Wormhole left-pads EVM addresses into a bytes32 format, to allow for compatibility with ecosystems that don't have 20-byte addresses. We use a helper 'fromWormholeFormat' here to obtain the address in 20-byte format (discarding the first 12 bytes).
-> See [this page](https://docs.wormhole.com/wormhole/reference/environments/evm#addresses) for more details.
-    
-```solidity
-    // Helper to convert 32-byte Wormhole formatted address to a standard EVM address
-    function fromWormholeFormat(bytes32 whFormatAddress) pure returns (address) {
-    	if (uint256(whFormatAddress) >> 160 != 0)
-    		revert NotAnEvmAddress(whFormatAddress);
-    	return address(uint160(uint256(whFormatAddress)));
-    }
-```
-    
-
 And voila, we have a full contract that can be deployed to many EVM chains, and in totality would form a full cross-chain application powered by Wormhole!
 
 Users with any wallet can request greetings to be emitted on any chain that is part of the system. 
@@ -328,4 +317,3 @@ Users with any wallet can request greetings to be emitted on any chain that is p
 ### Full Cross-chain HelloWormhole solidity contract
 
 See the [full implementation of the HelloWormhole.sol contract](https://github.com/wormhole-foundation/hello-wormhole/blob/main/src/HelloWormhole.sol) and the [full Github repository with testing infrastructure](https://github.com/wormhole-foundation/hello-wormhole/)
-

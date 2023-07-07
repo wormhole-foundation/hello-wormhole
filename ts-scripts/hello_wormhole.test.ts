@@ -29,13 +29,7 @@ describe("Hello Wormhole Integration Tests on Testnet", () => {
         await tx.wait();
         console.log(`See transaction at: https://testnet.snowtrace.io/tx/${tx.hash}`);
 
-        await new Promise(resolve => setTimeout(resolve, 1000*10));
-
-        /*
-        console.log("Checking relay status");
-        const res = await getStatus(CHAIN_ID_TO_NAME[sourceChain], tx.hash);
-        console.log(`Status: ${res.status}`);
-        console.log(`Info: ${res.info}`); */
+        await new Promise(resolve => setTimeout(resolve, 1000*15));
 
         console.log(`Reading greeting`);
         const readGreeting = await targetHelloWormholeContract.latestGreeting();
