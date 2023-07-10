@@ -26,6 +26,8 @@ contract HelloWormhole is IWormholeReceiver {
         
         // Use a function on the IWormholeRelayer interface to cause 'receiveWormholeMessages' (which is on a different blockchain!)
         // to be called in the intended way
+        //
+        // Test your code with 'forge test'
     }
 
     function receiveWormholeMessages(
