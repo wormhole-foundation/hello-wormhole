@@ -9,7 +9,7 @@ contract HelloWormholeForwarding is Base, IWormholeReceiver {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
     event GreetingSuccess(string greeting, address sender);
 
-    uint256 constant SENDING_GAS_LIMIT = 600_000;
+    uint256 constant SENDING_GAS_LIMIT = 550_000;
     uint256 constant CONFIRMATION_GAS_LIMIT = 50_000;
 
     string public latestGreeting;
