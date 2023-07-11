@@ -34,7 +34,8 @@ contract HelloWormholeForwardingTest is WormholeRelayerTest {
         // Front-end calculation for how much receiver value to request the greeting with
         // to ensure a confirmation is able to come back!
         vm.selectFork(targetFork);
-        uint256 receiverValueForConfirmation = helloTarget.quoteConfirmation(sourceChain);
+        // We bake in a 10% buffer to account for the possibility of a price change after the initial delivery but before the return delivery
+        uint256 receiverValueForConfirmation = helloTarget.quoteConfirmation(sourceChain) * 11 / 10; 
         vm.selectFork(sourceFork);
         // end front-end calculation
 
