@@ -40,6 +40,23 @@ contract HelloWormholeTest is WormholeRelayerBasicTest {
         assertEq(helloTarget.latestGreeting(), "Hello Wormhole!");
     }
 
+    function testGreetingOnlyWormholeRelayer_Step1() public {
+
+        bytes32 sourceAddress = toWormholeFormat(address(helloSource));
+        address sender = address(this);
+
+        vm.selectFork(targetFork);
+
+        vm.expectRevert();
+        helloTarget.receiveWormholeMessages(
+            abi.encode("Hello Wormhole!", sender),
+            new bytes[](0),
+            sourceAddress,
+            sourceChain,
+            keccak256("Arbitrary Delivery Hash")
+        );
+    }
+
     function testGreeting_Complete() public {
 
         uint256 cost = helloSource.quoteCrossChainGreeting(targetChain);
