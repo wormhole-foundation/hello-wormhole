@@ -38,7 +38,7 @@ contract HelloWormhole is IWormholeReceiver {
         bytes[] memory, // additionalVaas
         bytes32, // address that called 'sendPayloadToEvm' (HelloWormhole contract address)
         uint16 sourceChain,
-        bytes32 // deliveryHash
+        bytes32 // deliveryHash - this can be stored in a mapping deliveryHash => bool to prevent duplicate deliveries
     ) public payable override {
         require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
         (string memory greeting, address sender) = abi.decode(payload, (string, address));
