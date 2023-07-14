@@ -5,7 +5,7 @@ import "../../src/extensions/HelloWormholeProtections.sol";
 
 import "wormhole-solidity-sdk/testing/WormholeRelayerTest.sol";
 
-contract HelloWormholeProtectionsTest is WormholeRelayerTest {
+contract HelloWormholeProtectionsTest is WormholeRelayerBasicTest {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
 
     HelloWormholeProtections helloSource;
