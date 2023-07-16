@@ -7,16 +7,14 @@ import "forge-std/Test.sol";
 contract HelloWorldTest is Test {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
 
-    HelloWorld helloSource;
-    HelloWorld helloTarget;
+    HelloWorld helloWorld;
 
     function setUp() public {
-        helloSource = new HelloWorld();
-        helloTarget = new HelloWorld();
+        helloWorld = new HelloWorld();
     }
 
     function testGreeting() public {
-        helloSource.sendGreeting(address(helloTarget), "Hello World!");
-        assertEq(helloTarget.latestGreeting(), "Hello World!");
+        helloWorld.sendGreeting("Hello World!");
+        assertEq(helloWorld.latestGreeting(), "Hello World!");
     }
 }
