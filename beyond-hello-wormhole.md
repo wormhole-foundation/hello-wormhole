@@ -57,7 +57,7 @@ As mentioned in the first article, without having the mapping of delivery hashes
 
 ```solidity
 
-    mapping(bytes32 => bool) seenDeliveryVaaHashes;
+    mapping(bytes32 => bool) public seenDeliveryVaaHashes;
 
     modifier replayProtect(bytes32 deliveryHash) {
         require(!seenDeliveryVaaHashes[deliveryHash], "Message already processed");

@@ -33,7 +33,7 @@ contract HelloWormhole is IWormholeReceiver {
         );
     }
 
-    mapping(bytes32 => bool) seenDeliveryVaaHashes;
+    mapping(bytes32 => bool) public seenDeliveryVaaHashes;
 
     function receiveWormholeMessages(
         bytes memory payload,

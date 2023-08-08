@@ -285,7 +285,7 @@ You should store each delivery hash in a mapping from delivery hashes to boolean
 
     string public latestGreeting;
 
-    mapping(bytes32 => bool) seenDeliveryVaaHashes;
+    mapping(bytes32 => bool) public seenDeliveryVaaHashes;
 
     /**
      * @notice Endpoint that the Wormhole Relayer contract will call
