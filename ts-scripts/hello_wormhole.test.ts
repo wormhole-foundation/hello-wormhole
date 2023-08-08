@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 import { ethers } from "ethers";
-import { getHelloWormhole, getWallet, getDeliveryHash } from "./utils";
+import { getHelloWormhole, getWallet, getDeliveryHash, sleep } from "./utils";
 import { CHAIN_ID_TO_NAME } from "@certusone/wormhole-sdk";
 
 const sourceChain = 6;
@@ -39,20 +39,14 @@ describe("Hello Wormhole Integration Tests on Testnet", () => {
         { network: "TESTNET" }
       );
       console.log("Waiting for delivery...");
-      await new Promise((resolve) => {
-        let seconds = 0;
-        const interval = setInterval(async () => {
-          seconds += 1;
-          const completed =
-            await targetHelloWormholeContract.seenDeliveryVaaHashes(
-              deliveryHash
-            );
-          if (completed) {
-            resolve("done");
-            clearInterval(interval);
-          }
-        }, 1000);
-      });
+      while (true) {
+        await sleep(1000);
+        const completed =
+          await targetHelloWormholeContract.seenDeliveryVaaHashes(deliveryHash);
+        if (completed) {
+          break;
+        }
+      }
 
       console.log(`Reading greeting`);
       const readGreeting = await targetHelloWormholeContract.latestGreeting();
