@@ -51,13 +51,13 @@ Often, it is desirable that all of the requests go through your own source contr
 
 ### Problem 2 - The greetings can be relayed multiple times
 
-Anyone can fetch the delivery VAA corresponding to a sent greeting, and have it delivered again to the target HelloWormhole contract! This causes another `GreetingReceived` event to be emitted from the same `senderChain` and `sender`, even though the sender only intended on sending this greeting once.
+As mentioned in the first article, without having the mapping of delivery hashes to boolean, anyone can fetch the delivery VAA corresponding to a sent greeting, and have it delivered again to the target HelloWormhole contract! This causes another `GreetingReceived` event to be emitted from the same `senderChain` and `sender`, even though the sender only intended on sending this greeting once.
 
-**Solution:** In our implementation of receiveWormholeMessages, we can store each delivery hash in a mapping from delivery hashes to booleans, to indicate that the delivery has already been processed. Then, at the beginning we can check to see if the delivery has already been processed, and revert if it has.
+**Solution:** In our implementation of receiveWormholeMessages, we store each delivery hash in a mapping from delivery hashes to booleans, to indicate that the delivery has already been processed. Then, at the beginning we can check to see if the delivery has already been processed, and revert if it has.
 
 ```solidity
 
-    mapping(bytes32 => bool) seenDeliveryVaaHashes;
+    mapping(bytes32 => bool) public seenDeliveryVaaHashes;
 
     modifier replayProtect(bytes32 deliveryHash) {
         require(!seenDeliveryVaaHashes[deliveryHash], "Message already processed");

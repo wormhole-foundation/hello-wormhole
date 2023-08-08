@@ -1,40 +1,64 @@
-import {describe, expect, test} from "@jest/globals";
+import { describe, expect, test } from "@jest/globals";
 import { ethers } from "ethers";
-import {
-    getHelloWormhole,
-    getChain
-} from "./utils"
-import {
-    getStatus
-} from "./getStatus"
-import {
-    CHAIN_ID_TO_NAME
-} from "@certusone/wormhole-sdk"
+import { getHelloWormhole, getWallet, getDeliveryHash } from "./utils";
+import { CHAIN_ID_TO_NAME } from "@certusone/wormhole-sdk";
 
 const sourceChain = 6;
 const targetChain = 14;
 
 describe("Hello Wormhole Integration Tests on Testnet", () => {
-    test("Tests the sending of a random greeting", async () => {
-        const arbitraryGreeting = `Hello Wormhole ${new Date().getTime()}`;
-        const sourceHelloWormholeContract = getHelloWormhole(sourceChain);
-        const targetHelloWormholeContract = getHelloWormhole(targetChain);
+  test(
+    "Tests the sending of a random greeting",
+    async () => {
+      const arbitraryGreeting = `Hello Wormhole ${new Date().getTime()}`;
+      const sourceHelloWormholeContract = getHelloWormhole(sourceChain);
+      const targetHelloWormholeContract = getHelloWormhole(targetChain);
 
-        const cost = await sourceHelloWormholeContract.quoteCrossChainGreeting(targetChain);
-        console.log(`Cost of sending the greeting: ${ethers.utils.formatEther(cost)} testnet AVAX`);
+      const cost = await sourceHelloWormholeContract.quoteCrossChainGreeting(
+        targetChain
+      );
+      console.log(
+        `Cost of sending the greeting: ${ethers.utils.formatEther(
+          cost
+        )} testnet AVAX`
+      );
 
-        console.log(`Sending greeting: ${arbitraryGreeting}`);
-        const tx = await sourceHelloWormholeContract.sendCrossChainGreeting(targetChain, targetHelloWormholeContract.address, arbitraryGreeting, {value: cost});
-        console.log(`Transaction hash: ${tx.hash}`);
-        await tx.wait();
-        console.log(`See transaction at: https://testnet.snowtrace.io/tx/${tx.hash}`);
+      console.log(`Sending greeting: ${arbitraryGreeting}`);
+      const tx = await sourceHelloWormholeContract.sendCrossChainGreeting(
+        targetChain,
+        targetHelloWormholeContract.address,
+        arbitraryGreeting,
+        { value: cost }
+      );
+      console.log(`Transaction hash: ${tx.hash}`);
+      const rx = await tx.wait();
 
-        await new Promise(resolve => setTimeout(resolve, 1000*15));
+      const deliveryHash = await getDeliveryHash(
+        rx,
+        CHAIN_ID_TO_NAME[sourceChain],
+        { network: "TESTNET" }
+      );
+      console.log("Waiting for delivery...");
+      await new Promise((resolve) => {
+        let seconds = 0;
+        const interval = setInterval(async () => {
+          seconds += 1;
+          const completed =
+            await targetHelloWormholeContract.seenDeliveryVaaHashes(
+              deliveryHash
+            );
+          if (completed) {
+            resolve("done");
+            clearInterval(interval);
+          }
+        }, 1000);
+      });
 
-        console.log(`Reading greeting`);
-        const readGreeting = await targetHelloWormholeContract.latestGreeting();
-        console.log(`Latest greeting: ${readGreeting}`);
-        expect(readGreeting).toBe(arbitraryGreeting);
-
-    }, 60*1000) // timeout
-})
+      console.log(`Reading greeting`);
+      const readGreeting = await targetHelloWormholeContract.latestGreeting();
+      console.log(`Latest greeting: ${readGreeting}`);
+      expect(readGreeting).toBe(arbitraryGreeting);
+    },
+    60 * 1000
+  ); // timeout
+});
