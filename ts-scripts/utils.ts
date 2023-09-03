@@ -148,7 +148,7 @@ import {
   CHAINS,
 } from "@certusone/wormhole-sdk";
 
-export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Temporarily here - will move to the typescript SDK soon so it can be directly imported from there!
 export async function getDeliveryHash(
