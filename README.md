@@ -233,12 +233,12 @@ interface IWormholeReceiver {
      *       on every call, checks that deliveryHash has not already been stored in the
      *       map (This is to prevent other users maliciously trying to relay the same message)
      *   - Checks that `sourceChain` and `sourceAddress` are indeed who
-     *       you expect to have requested the calling of `send` or `forward` on the source chain
+     *       you expect to have requested the calling of `send` on the source chain
      *
      * The invocation of this function corresponding to the `send` request will have msg.value equal
      *   to the receiverValue specified in the send request.
      *
-     * If the invocation of this function reverts or exceeds the gas limit
+     * If the invocation of this function reverts or exceeds the gas limit 
      *   specified by the send requester, this delivery will result in a `ReceiverFailure`.
      *
      * @param payload - an arbitrary message which was included in the delivery by the
