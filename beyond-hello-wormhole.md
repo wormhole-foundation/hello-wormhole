@@ -12,7 +12,7 @@ Topics covered:
   - Restricting the sender
   - Preventing duplicate deliveries
 - Refunds
-- Forwarding
+- Chained Deliveries
 - Delivering existing VAAs
 
 ## Protections
@@ -167,37 +167,6 @@ One way to do this is to call `sendPayloadToEvm` within the implementation of `r
 How do you know how much receiver value to request in your delivery on chain A? Unfortunately, the amount you need depends on a quote that the delivery provider on chain B can provide. Our best recommendation here is to expose this 'receiverValue' amount as a parameter on your contract's endpoint, and have the front-end of your application determine the correct value to pass here by querying the WormholeRelayer contract on chain B.
 
 Included in the HelloWormhole repository is an [example contract](https://github.com/wormhole-foundation/hello-wormhole/blob/main/src/extensions/HelloWormholeConfirmation.sol) (and [forge tests](https://github.com/wormhole-foundation/hello-wormhole/blob/main/test/extensions/HelloWormholeConfirmation.t.sol)) that go from chain A to chain B to chain C, using the recommendation above.
-
-There is still a downside - if you had provided a `refundAddress`, you are likely entitled to some amount of chain B currency as a refund from your chain A → B delivery! Ideally, you’d like to use this refund as part of the funding towards executing your B → C delivery request. If that isn’t possible, your next best options are to provide a wallet on the target chain to receive your refund, or request your refund be sent to a different chain (in which case you lose a portion of your refund to the fee of an additional delivery).
-
-We provide an [alternative way to achieve this that provides some cost savings: Forwarding](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/relayer/IWormholeRelayer.sol#L271). The purpose of forwarding is to use the refund from chain A → B to add to the funding of the delivery from chain B → C.
-
-Included in the HelloWormhole repository is an [example contract](https://github.com/wormhole-foundation/hello-wormhole/blob/main/src/extensions/HelloWormholeForwarding.sol) (and [forge tests](https://github.com/wormhole-foundation/hello-wormhole/blob/main/test/extensions/HelloWormholeForwarding.t.sol)) that use the forwarding feature as described, along with the 'front-end' recommendation described above.
-
-Simply use `forwardPayloadToEvm` instead of `sendPayloadToEvm` to use this functionality!
-
-```solidity
-/*
- * The following equation must be satisfied
- * (sum_f indicates summing over all forwards requested in
- * `receiveWormholeMessages`):
- * (refund amount from current execution of receiveWormholeMessages)
- * + sum_f [msg.value_f]
- * >= sum_f [quoteEVMDeliveryPrice(targetChain_f, receiverValue_f, gasLimit_f)]
- */
-
-function forwardPayloadToEvm(
-        uint16 targetChain,
-        address targetAddress,
-        bytes memory payload,
-        uint256 receiverValue,
-        uint256 gasLimit
-) external payable;
-```
-
-> Note: If at least one forward is requested and there doesn’t end up being enough of a refund leftover to complete the forward(s), then the full delivery on chain B will revert, and the status (emitted in an event from the Wormhole Relayer contract) will be ‘FORWARD_REQUEST_FAILURE’.
-
-If all the forwards requested are able to be executed (i.e. there is enough of a refund leftover such that all of them can be funded), the status will be `FORWARD_REQUEST_SUCCESS`
 
 ## Composing with other Wormhole modules - Requesting Delivery of Existing Wormhole Messages
 

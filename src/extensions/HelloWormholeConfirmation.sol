@@ -38,8 +38,6 @@ contract HelloWormholeConfirmation is Base, IWormholeReceiver {
             receiverValueForSecondDeliveryPayment, // will be used to pay for the confirmation
             SENDING_GAS_LIMIT,
             // we add a refund chain and address as the requester of the cross chain greeting
-            // The refund from this 'send' will be tacked on to the confirmation delivery
-            // (because we will request the confirmation using the 'forward' feature)
             chainId, 
             msg.sender
         );
@@ -71,8 +69,8 @@ contract HelloWormholeConfirmation is Base, IWormholeReceiver {
             emit GreetingReceived(latestGreeting, sourceChain, sender);
 
             uint256 confirmationCost = quoteConfirmation(sourceChain);
-            require(msg.value >= confirmationCost, "Didn't receive enough value for the forward!");
-            wormholeRelayer.forwardPayloadToEvm{value: msg.value}(
+            require(msg.value >= confirmationCost, "Didn't receive enough value for the second send!");
+            wormholeRelayer.sendPayloadToEvm{value: confirmationCost}(
                 sourceChain, 
                 fromWormholeFormat(sourceAddress), 
                 abi.encode(MessageType.CONFIRMATION, greeting, sender),
