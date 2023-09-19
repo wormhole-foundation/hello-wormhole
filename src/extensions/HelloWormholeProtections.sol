@@ -35,14 +35,13 @@ contract HelloWormholeProtections is Base, IWormholeReceiver {
         bytes[] memory, // additionalVaas
         bytes32 sourceAddress,
         uint16 sourceChain,
-        bytes32 deliveryHash
+        bytes32 // delivery hash
     )
         public
         payable
         override
         onlyWormholeRelayer
         isRegisteredSender(sourceChain, sourceAddress)
-        replayProtect(deliveryHash)
     {
         (string memory greeting, address sender) = abi.decode(payload, (string, address));
         latestGreeting = greeting;
