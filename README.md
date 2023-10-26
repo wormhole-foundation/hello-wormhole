@@ -228,17 +228,13 @@ interface IWormholeReceiver {
      *
      * NOTE: This function should be restricted such that only the Wormhole Relayer contract can call it.
      *
-     * We also recommend that this function:
-     *   - Stores all received `deliveryHash`s in a mapping `(bytes32 => bool)`, and
-     *       on every call, checks that deliveryHash has not already been stored in the
-     *       map (This is to prevent other users maliciously trying to relay the same message)
-     *   - Checks that `sourceChain` and `sourceAddress` are indeed who
+     * We also recommend that this function checks that `sourceChain` and `sourceAddress` are indeed who
      *       you expect to have requested the calling of `send` on the source chain
      *
      * The invocation of this function corresponding to the `send` request will have msg.value equal
      *   to the receiverValue specified in the send request.
      *
-     * If the invocation of this function reverts or exceeds the gas limit 
+     * If the invocation of this function reverts or exceeds the gas limit
      *   specified by the send requester, this delivery will result in a `ReceiverFailure`.
      *
      * @param payload - an arbitrary message which was included in the delivery by the
@@ -275,48 +271,6 @@ So, in receiveWormholeMessages, we want to:
 > Note: It is crucial that only the Wormhole Relayer contract can call receiveWormholeMessages
 
 To provide certainty about the validity of the payload, we must restrict the msg.sender of this function to only be the Wormhole Relayer contract. Otherwise, anyone could call this receiveWormholeMessages endpoint with fake greetings, source chains, and source senders.
-
-### One more step
-
-You should store each delivery hash in a mapping from delivery hashes to booleans, to prevent duplicate processing of deliveries! This also gives you a way of tracking the completion of sent deliveries
-
-```solidity
-    event GreetingReceived(string greeting, uint16 senderChain, address sender);
-
-    string public latestGreeting;
-
-    mapping(bytes32 => bool) public seenDeliveryVaaHashes;
-
-    /**
-     * @notice Endpoint that the Wormhole Relayer contract will call
-     * to deliver the greeting
-     */
-    function receiveWormholeMessages(
-        bytes memory payload,
-        bytes[] memory, // additionalVaas
-        bytes32 sourceAddress,
-        uint16 sourceChain,
-        bytes32 // deliveryHash
-    ) public payable override {
-        require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
-
-        // Ensure no duplicate deliveries
-        require(!seenDeliveryVaaHashes[deliveryHash], "Message already processed");
-        seenDeliveryVaaHashes[deliveryHash] = true;
-
-        // Parse the payload and do the corresponding actions!
-
-        (string memory greeting, address sender) = abi.decode(payload, (string, address));
-
-        latestGreeting = greeting;
-
-        emit GreetingReceived(
-            latestGreeting,
-            sourceChain,
-            fromWormholeFormat(sourceAddress)
-        );
-    }
-```
 
 And voila, we have a full contract that can be deployed to many EVM chains, and in totality would form a full cross-chain application powered by Wormhole!
 

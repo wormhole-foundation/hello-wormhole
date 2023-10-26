@@ -17,11 +17,21 @@ contract HelloWormhole is IWormholeReceiver {
         wormholeRelayer = IWormholeRelayer(_wormholeRelayer);
     }
 
-    function quoteCrossChainGreeting(uint16 targetChain) public view returns (uint256 cost) {
-        (cost,) = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, 0, GAS_LIMIT);
+    function quoteCrossChainGreeting(
+        uint16 targetChain
+    ) public view returns (uint256 cost) {
+        (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
+            targetChain,
+            0,
+            GAS_LIMIT
+        );
     }
 
-    function sendCrossChainGreeting(uint16 targetChain, address targetAddress, string memory greeting) public payable {
+    function sendCrossChainGreeting(
+        uint16 targetChain,
+        address targetAddress,
+        string memory greeting
+    ) public payable {
         uint256 cost = quoteCrossChainGreeting(targetChain);
         require(msg.value == cost);
         wormholeRelayer.sendPayloadToEvm{value: cost}(
@@ -33,8 +43,6 @@ contract HelloWormhole is IWormholeReceiver {
         );
     }
 
-    mapping(bytes32 => bool) public seenDeliveryVaaHashes;
-
     function receiveWormholeMessages(
         bytes memory payload,
         bytes[] memory, // additionalVaas
@@ -44,14 +52,12 @@ contract HelloWormhole is IWormholeReceiver {
     ) public payable override {
         require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
 
-        // Ensure no duplicate deliveries
-        require(!seenDeliveryVaaHashes[deliveryHash], "Message already processed");
-        seenDeliveryVaaHashes[deliveryHash] = true;
-
         // Parse the payload and do the corresponding actions!
-        (string memory greeting, address sender) = abi.decode(payload, (string, address));
+        (string memory greeting, address sender) = abi.decode(
+            payload,
+            (string, address)
+        );
         latestGreeting = greeting;
         emit GreetingReceived(latestGreeting, sourceChain, sender);
     }
-
 }
