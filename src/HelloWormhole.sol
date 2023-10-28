@@ -33,20 +33,14 @@ contract HelloWormhole is IWormholeReceiver {
         );
     }
 
-    mapping(bytes32 => bool) public seenDeliveryVaaHashes;
-
     function receiveWormholeMessages(
         bytes memory payload,
         bytes[] memory, // additionalVaas
         bytes32, // address that called 'sendPayloadToEvm' (HelloWormhole contract address)
         uint16 sourceChain,
-        bytes32 deliveryHash // this can be stored in a mapping deliveryHash => bool to prevent duplicate deliveries
+        bytes32 // delivery hash - unique identifier of delivery
     ) public payable override {
         require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
-
-        // Ensure no duplicate deliveries
-        require(!seenDeliveryVaaHashes[deliveryHash], "Message already processed");
-        seenDeliveryVaaHashes[deliveryHash] = true;
 
         // Parse the payload and do the corresponding actions!
         (string memory greeting, address sender) = abi.decode(payload, (string, address));
