@@ -17,18 +17,39 @@ contract HelloWormholeConfirmation is Base, IWormholeReceiver {
 
     uint16 chainId;
 
-    enum MessageType {GREETING, CONFIRMATION}
+    enum MessageType {
+        GREETING,
+        CONFIRMATION
+    }
 
-    constructor(address _wormholeRelayer, address _wormhole) Base(_wormholeRelayer, _wormhole) {}
+    constructor(
+        address _wormholeRelayer,
+        address _wormhole
+    ) Base(_wormholeRelayer, _wormhole) {}
 
-    function quoteCrossChainGreeting(uint16 targetChain, uint256 receiverValue) public view returns (uint256 cost) {
-        (cost,) = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, receiverValue, SENDING_GAS_LIMIT);
+    function quoteCrossChainGreeting(
+        uint16 targetChain,
+        uint256 receiverValue
+    ) public view returns (uint256 cost) {
+        (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
+            targetChain,
+            receiverValue,
+            SENDING_GAS_LIMIT
+        );
     }
 
     // receiverValueForSecondDeliveryPayment will be determined in a front-end calculation (by calling quoteConfirmation on the target chain)
     // We recommend baking in a buffer to account for the possibility of the price of targetChain->sourceChain changing during the sourceChain->targetChain delivery
-    function sendCrossChainGreeting(uint16 targetChain, address targetAddress, string memory greeting, uint256 receiverValueForSecondDeliveryPayment) public payable {
-        uint256 cost = quoteCrossChainGreeting(targetChain, receiverValueForSecondDeliveryPayment);
+    function sendCrossChainGreeting(
+        uint16 targetChain,
+        address targetAddress,
+        string memory greeting,
+        uint256 receiverValueForSecondDeliveryPayment
+    ) public payable {
+        uint256 cost = quoteCrossChainGreeting(
+            targetChain,
+            receiverValueForSecondDeliveryPayment
+        );
         require(msg.value == cost);
 
         wormholeRelayer.sendPayloadToEvm{value: cost}(
@@ -38,13 +59,19 @@ contract HelloWormholeConfirmation is Base, IWormholeReceiver {
             receiverValueForSecondDeliveryPayment, // will be used to pay for the confirmation
             SENDING_GAS_LIMIT,
             // we add a refund chain and address as the requester of the cross chain greeting
-            chainId, 
+            chainId,
             msg.sender
         );
     }
 
-    function quoteConfirmation(uint16 targetChain) public view returns (uint256 cost) {
-        (cost,) = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, 0, CONFIRMATION_GAS_LIMIT);
+    function quoteConfirmation(
+        uint16 targetChain
+    ) public view returns (uint256 cost) {
+        (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
+            targetChain,
+            0,
+            CONFIRMATION_GAS_LIMIT
+        );
     }
 
     function receiveWormholeMessages(
@@ -52,33 +79,41 @@ contract HelloWormholeConfirmation is Base, IWormholeReceiver {
         bytes[] memory, // additionalVaas
         bytes32 sourceAddress,
         uint16 sourceChain,
-        bytes32 deliveryHash
+        bytes32 // deliveryHash
     )
         public
         payable
         override
         onlyWormholeRelayer
         isRegisteredSender(sourceChain, sourceAddress)
-        replayProtect(deliveryHash)
     {
         MessageType msgType = abi.decode(payload, (MessageType));
 
-        if(msgType == MessageType.GREETING) {
-            (,string memory greeting, address sender) = abi.decode(payload, (MessageType, string, address));
+        if (msgType == MessageType.GREETING) {
+            (, string memory greeting, address sender) = abi.decode(
+                payload,
+                (MessageType, string, address)
+            );
             latestGreeting = greeting;
             emit GreetingReceived(latestGreeting, sourceChain, sender);
 
             uint256 confirmationCost = quoteConfirmation(sourceChain);
-            require(msg.value >= confirmationCost, "Didn't receive enough value for the second send!");
+            require(
+                msg.value >= confirmationCost,
+                "Didn't receive enough value for the second send!"
+            );
             wormholeRelayer.sendPayloadToEvm{value: confirmationCost}(
-                sourceChain, 
-                fromWormholeFormat(sourceAddress), 
+                sourceChain,
+                fromWormholeFormat(sourceAddress),
                 abi.encode(MessageType.CONFIRMATION, greeting, sender),
                 0,
                 CONFIRMATION_GAS_LIMIT
             );
-        } else if(msgType == MessageType.CONFIRMATION) {
-            (,string memory greeting, address sender) = abi.decode(payload, (MessageType, string, address));
+        } else if (msgType == MessageType.CONFIRMATION) {
+            (, string memory greeting, address sender) = abi.decode(
+                payload,
+                (MessageType, string, address)
+            );
             emit GreetingSuccess(greeting, sender);
             latestConfirmedSentGreeting = greeting;
         }
