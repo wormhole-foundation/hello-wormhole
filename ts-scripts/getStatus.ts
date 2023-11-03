@@ -16,7 +16,8 @@ export async function getStatus(
     transactionHash,
     { environment: "TESTNET" }
   );
-  const status = info.targetChainStatus.events[0].status;
+  const status =
+    info.targetChainStatus.events[0]?.status || DeliveryStatus.PendingDelivery;
   return { status, info: info.stringified || "Info not obtained" };
 }
 
