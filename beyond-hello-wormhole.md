@@ -8,16 +8,14 @@ HelloWormhole is a great example application, but has much room for improvement.
 
 Topics covered:
 
-- Protections
-  - Restricting the sender
-  - Preventing duplicate deliveries
+- Restricting the sender
 - Refunds
 - Chained Deliveries
 - Delivering existing VAAs
 
 ## Protections
 
-### Problem 1 - The greetings can come from anyone
+### Issue: The greetings can come from anyone
 
 A user doesn’t have to go through the HelloWormhole contract to request a greeting - they can call `wormholeRelayer.sendPayloadToEvm{value: cost}(…)` themselves!
 
@@ -49,26 +47,9 @@ Often, it is desirable that all of the requests go through your own source contr
     }
 ```
 
-### Problem 2 - The greetings can be relayed multiple times
+### Example Solution for Problem 1
 
-As mentioned in the first article, without having the mapping of delivery hashes to boolean, anyone can fetch the delivery VAA corresponding to a sent greeting, and have it delivered again to the target HelloWormhole contract! This causes another `GreetingReceived` event to be emitted from the same `senderChain` and `sender`, even though the sender only intended on sending this greeting once.
-
-**Solution:** In our implementation of receiveWormholeMessages, we store each delivery hash in a mapping from delivery hashes to booleans, to indicate that the delivery has already been processed. Then, at the beginning we can check to see if the delivery has already been processed, and revert if it has.
-
-```solidity
-
-    mapping(bytes32 => bool) public seenDeliveryVaaHashes;
-
-    modifier replayProtect(bytes32 deliveryHash) {
-        require(!seenDeliveryVaaHashes[deliveryHash], "Message already processed");
-        seenDeliveryVaaHashes[deliveryHash] = true;
-        _;
-    }
-```
-
-### Example Solution for Problems 1 and 2
-
-We provide a base class in the [Wormhole Solidity SDK](https://github.com/wormhole-foundation/wormhole-solidity-sdk) that includes the modifiers shown above, makes it easy to add these functionalities as such
+We provide a base class in the [Wormhole Solidity SDK](https://github.com/wormhole-foundation/wormhole-solidity-sdk) that includes the modifier shown above, makes it easy to add these functionalities as such
 
 ```solidity
     function receiveWormholeMessages(
@@ -83,7 +64,6 @@ We provide a base class in the [Wormhole Solidity SDK](https://github.com/wormho
         override
         onlyWormholeRelayer
         isRegisteredSender(sourceChain, sourceAddress)
-        replayProtect(deliveryHash)
     {
         latestGreeting = abi.decode(payload, (string));
 

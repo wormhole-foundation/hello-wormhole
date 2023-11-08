@@ -12,13 +12,26 @@ contract HelloWormholeProtections is Base, IWormholeReceiver {
 
     string public latestGreeting;
 
-    constructor(address _wormholeRelayer, address _wormhole) Base(_wormholeRelayer, _wormhole) {}
+    constructor(
+        address _wormholeRelayer,
+        address _wormhole
+    ) Base(_wormholeRelayer, _wormhole) {}
 
-    function quoteCrossChainGreeting(uint16 targetChain) public view returns (uint256 cost) {
-        (cost,) = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, 0, GAS_LIMIT);
+    function quoteCrossChainGreeting(
+        uint16 targetChain
+    ) public view returns (uint256 cost) {
+        (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
+            targetChain,
+            0,
+            GAS_LIMIT
+        );
     }
 
-    function sendCrossChainGreeting(uint16 targetChain, address targetAddress, string memory greeting) public payable {
+    function sendCrossChainGreeting(
+        uint16 targetChain,
+        address targetAddress,
+        string memory greeting
+    ) public payable {
         uint256 cost = quoteCrossChainGreeting(targetChain);
         require(msg.value == cost);
         wormholeRelayer.sendPayloadToEvm{value: cost}(
@@ -35,16 +48,18 @@ contract HelloWormholeProtections is Base, IWormholeReceiver {
         bytes[] memory, // additionalVaas
         bytes32 sourceAddress,
         uint16 sourceChain,
-        bytes32 deliveryHash
+        bytes32 // delivery hash
     )
         public
         payable
         override
         onlyWormholeRelayer
         isRegisteredSender(sourceChain, sourceAddress)
-        replayProtect(deliveryHash)
     {
-        (string memory greeting, address sender) = abi.decode(payload, (string, address));
+        (string memory greeting, address sender) = abi.decode(
+            payload,
+            (string, address)
+        );
         latestGreeting = greeting;
 
         emit GreetingReceived(latestGreeting, sourceChain, sender);

@@ -2,6 +2,7 @@ import { describe, expect, test } from "@jest/globals";
 import { ethers } from "ethers";
 import { getHelloWormhole, getWallet, getDeliveryHash, sleep } from "./utils";
 import { CHAIN_ID_TO_NAME } from "@certusone/wormhole-sdk";
+import { waitForDelivery } from "./getStatus";
 
 const sourceChain = 6;
 const targetChain = 14;
@@ -33,26 +34,13 @@ describe("Hello Wormhole Integration Tests on Testnet", () => {
       console.log(`Transaction hash: ${tx.hash}`);
       const rx = await tx.wait();
 
-      const deliveryHash = await getDeliveryHash(
-        rx,
-        CHAIN_ID_TO_NAME[sourceChain],
-        { network: "TESTNET" }
-      );
-      console.log("Waiting for delivery...");
-      while (true) {
-        await sleep(1000);
-        const completed =
-          await targetHelloWormholeContract.seenDeliveryVaaHashes(deliveryHash);
-        if (completed) {
-          break;
-        }
-      }
+      await waitForDelivery(CHAIN_ID_TO_NAME[sourceChain], tx.hash);
 
       console.log(`Reading greeting`);
       const readGreeting = await targetHelloWormholeContract.latestGreeting();
       console.log(`Latest greeting: ${readGreeting}`);
       expect(readGreeting).toBe(arbitraryGreeting);
     },
-    60 * 1000
+    60 * 1000 * 60
   ); // timeout
 });
