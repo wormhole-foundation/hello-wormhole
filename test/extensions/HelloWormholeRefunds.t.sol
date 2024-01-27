@@ -30,7 +30,6 @@ contract HelloWormholeRefundsTest is WormholeRelayerBasicTest {
         vm.deal(refundAddress, 0);
 
         vm.selectFork(sourceFork);
-
         helloSource.sendCrossChainGreeting{value: cost}(targetChain, address(helloTarget), "Hello Wormhole!", targetChain, refundAddress);
 
         performDelivery();
@@ -48,10 +47,12 @@ contract HelloWormholeRefundsTest is WormholeRelayerBasicTest {
 
         vm.recordLogs();
 
+        vm.selectFork(targetFork);
         address payable refundAddress = payable(0x1234567890123456789012345678901234567890);
         vm.deal(refundAddress, 0);
 
-        helloSource.sendCrossChainGreeting{value: cost}(targetChain, address(helloTarget), "Hello Wormhole!", sourceChain, refundAddress);
+        vm.selectFork(sourceFork);
+        helloSource.sendCrossChainGreeting{value: cost}(targetChain, address(helloTarget), "Hello Wormhole!", targetChain, refundAddress);
 
         performDelivery();
 
