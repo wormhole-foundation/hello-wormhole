@@ -16,13 +16,14 @@
   },
   "dependencies": {
     "@typechain/ethers-v6": "^0.4.0",
-    "ethers": "^6",
-    "ts-node": "^10.9.1",
-    "typechain": "^8.2.0",
     "@wormhole-foundation/connect-sdk": "^0.4.0-beta.2",
     "@wormhole-foundation/connect-sdk-evm": "^0.4.0-beta.2",
+    "@wormhole-foundation/connect-sdk-evm-cctp": "^0.4.0-beta.2",
     "@wormhole-foundation/connect-sdk-evm-core": "^0.4.0-beta.2",
-    "@wormhole-foundation/connect-sdk-evm-cctp": "^0.4.0-beta.2"
+    "dotenv": "^16.4.1",
+    "ethers": "^6",
+    "ts-node": "^10.9.1",
+    "typechain": "^8.2.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.2",

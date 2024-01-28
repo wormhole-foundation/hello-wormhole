@@ -1,13 +1,20 @@
 import * as ethers from "ethers";
 import {
+  getChainInfo,
+  loadConfig,
+  loadDeployedAddresses,
+  storeDeployedAddresses,
+} from "./config";
+import {
+  checkFlag,
   checkSubcommand,
   getArg,
   getHelloWormhole,
-  loadConfig,
-  checkFlag,
+  getStatus,
+  getWallet,
 } from "./utils";
-import { deploy } from "./deploy";
-import { getStatus } from "./getStatus";
+
+import { HelloWormhole__factory } from "./ethers-contracts";
 
 import "@wormhole-foundation/connect-sdk-evm-core";
 
@@ -31,6 +38,29 @@ async function main() {
     );
     console.log(status.info);
   }
+}
+
+export async function deploy() {
+  const config = loadConfig();
+
+  const deployed = loadDeployedAddresses();
+  for (const chainId of config.chains.map((c) => c.chainId)) {
+    const chain = getChainInfo(chainId);
+    const signer = getWallet(chainId);
+    const helloWormhole = await new HelloWormhole__factory(signer).deploy(
+      chain.wormholeRelayer
+    );
+    await helloWormhole.waitForDeployment();
+    const address = await helloWormhole.getAddress();
+
+    deployed.helloWormhole[chainId] = address;
+
+    console.log(
+      `HelloWormhole deployed to ${address} on ${chain.description} (chain ${chainId})`
+    );
+  }
+
+  storeDeployedAddresses(deployed);
 }
 
 async function sendGreeting() {
@@ -59,7 +89,6 @@ async function sendGreeting() {
 
 async function read(s = "State: \n\n") {
   for (const chainId of loadConfig().chains.map((c) => c.chainId)) {
-    let i = 0;
     const helloWormhole = getHelloWormhole(chainId);
     const greeting = await helloWormhole.latestGreeting();
     s += `chain ${chainId}: ${greeting}\n`;
