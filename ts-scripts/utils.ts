@@ -1,142 +1,69 @@
 import { ethers, Wallet } from "ethers";
-import { readFileSync, writeFileSync } from "fs";
-
 import { HelloWormhole, HelloWormhole__factory } from "./ethers-contracts";
-
 import {
-  EvmNativeSigner,
+  Chain,
+  toChain,
+  Signer,
+  Wormhole,
+  toChainId,
+} from "@wormhole-foundation/connect-sdk";
+import {
+  EvmChains,
   EvmPlatform,
   getEvmSignerForKey,
 } from "@wormhole-foundation/connect-sdk-evm";
-import {
-  Chain,
-  CONFIG,
-  Network,
-  Signer,
-  toChain,
-  Wormhole,
-} from "@wormhole-foundation/connect-sdk";
+import { loadDeployedAddresses, NETWORK, NetworkConfig } from "./config";
+
+import "@wormhole-foundation/connect-sdk-evm-core";
+import { HelloWormholeClient } from "./helloWormhole";
 
 // read in from `.env`
 require("dotenv").config();
-
 function getEnv(key: string): string {
-  // If we're in the browser, return empty string
   if (typeof process === undefined) return "";
-  // Otherwise, return the env var or error
-  const val = process.env[key];
-  if (!val)
-    throw new Error(
-      `Missing env var ${key}, did you forget to set valies in '.env'?`
-    );
-  return val;
+  if (!(key in process.env))
+    throw `Missing env var ${key}, did you forget to set values in '.env'?`;
+  return process.env[key]!;
 }
 
-export async function getSigner<N extends Network, C extends Chain>(
-  network: N,
-  chain: C
-): Promise<Signer> {
-  const wh = new Wormhole(network, [EvmPlatform]);
-  const ctx = wh.getChain(chain);
-  return await getEvmSignerForKey(
-    await ctx.getRpc(),
-    getEnv("ETH_PRIVATE_KEY")
+export const getEvmKey = (): string => getEnv("EVM_PRIVATE_KEY");
+
+export const getSigner = async (chain: Chain): Promise<Signer> =>
+  await getEvmSignerForKey(getRpc(toChainId(chain)), getEvmKey());
+
+export const getRpc = (chainId: number): ethers.Provider =>
+  new ethers.JsonRpcProvider(NetworkConfig.chains[toChain(chainId)]?.rpc);
+
+export const getWallet = (chainId: number): Wallet =>
+  new Wallet(getEvmKey(), getRpc(chainId));
+
+export const getWormhole = (): Wormhole<typeof NETWORK> =>
+  new Wormhole(NETWORK, [EvmPlatform]);
+
+export const getHelloWormhole = (chainId: number): HelloWormhole =>
+  getHelloWormholeClient(chainId).helloWormhole;
+
+export const getHelloWormholeClient = (
+  chainId: number
+): HelloWormholeClient<typeof NETWORK, EvmChains> =>
+  new HelloWormholeClient(
+    NETWORK,
+    toChain(chainId) as EvmChains,
+    getRpc(chainId),
+    loadDeployedAddresses().helloWormhole[chainId]
   );
-}
 
-export interface ChainInfo {
-  description: string;
-  chainId: number;
-  rpc: string;
-  tokenBridge: string;
-  wormholeRelayer: string;
-  wormhole: string;
-}
+export async function getStatus(
+  sourceChain: EvmChains,
+  txid: string
+): Promise<{ status: string; info: string }> {
+  const wh = getWormhole();
+  const ctx = wh.getChain(sourceChain);
+  const [msgid] = await ctx.parseTransaction(txid);
 
-export interface Config {
-  chains: ChainInfo[];
-}
-export interface DeployedAddresses {
-  helloWormhole: Record<number, string>;
-  erc20s: Record<number, string[]>;
-}
-
-export function getHelloWormhole(chainId: number): HelloWormhole {
-  const deployed = loadDeployedAddresses().helloWormhole[chainId];
-  if (!deployed) {
-    throw new Error(`No deployed hello wormhole on chain ${chainId}`);
-  }
-  return HelloWormhole__factory.connect(deployed, getWallet(chainId));
-}
-
-export function getChain(network: Network, chainId: number): ChainInfo {
-  const chain = toChain(chainId);
-
-  const conf = CONFIG[network].chains[chain]!;
-  const info: ChainInfo = {
-    description: `${network}:${chain}`,
-    chainId,
-    rpc: conf.rpc,
-    tokenBridge: conf.contracts.tokenBridge!,
-    wormholeRelayer: conf.contracts.relayer!,
-    wormhole: conf.contracts.coreBridge!,
-  };
-
-  return info;
-}
-
-export function getWallet(chainId: number): Wallet {
-  const rpc = loadConfig().chains.find((c) => c.chainId === chainId)?.rpc;
-  let provider = new ethers.JsonRpcProvider(rpc);
-  if (!process.env.EVM_PRIVATE_KEY)
-    throw Error(
-      "No private key provided (use the EVM_PRIVATE_KEY environment variable)"
-    );
-  return new Wallet(process.env.EVM_PRIVATE_KEY!, provider);
-}
-
-let _config: Config | undefined;
-let _deployed: DeployedAddresses | undefined;
-
-export function loadConfig(): Config {
-  if (!_config) {
-    _config = JSON.parse(
-      readFileSync("ts-scripts/testnet/config.json", { encoding: "utf-8" })
-    );
-  }
-  return _config!;
-}
-
-export function loadDeployedAddresses(
-  fileMustBePresent?: "fileMustBePresent"
-): DeployedAddresses {
-  if (!_deployed) {
-    try {
-      _deployed = JSON.parse(
-        readFileSync("ts-scripts/testnet/deployedAddresses.json", {
-          encoding: "utf-8",
-        })
-      );
-    } catch (e) {
-      if (fileMustBePresent) {
-        throw e;
-      }
-    }
-    if (!_deployed) {
-      _deployed = {
-        erc20s: [],
-        helloWormhole: [],
-      };
-    }
-  }
-  return _deployed!;
-}
-
-export function storeDeployedAddresses(deployed: DeployedAddresses) {
-  writeFileSync(
-    "ts-scripts/testnet/deployedAddresses.json",
-    JSON.stringify(deployed, undefined, 2)
-  );
+  const info = await wh.getTransactionStatus(msgid!);
+  const status = info?.globalTx?.originTx.status || "Pending";
+  return { status, info: JSON.stringify(info) || "Info not obtained" };
 }
 
 export function checkSubcommand(patterns: string | string[]) {
@@ -183,9 +110,3 @@ export function getArg(
   }
   return process.argv[idx + 1];
 }
-
-export const deployed = (x: any) => x.deployed();
-export const wait = (x: any) => x.wait();
-
-export const sleep = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
