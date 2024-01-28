@@ -1,30 +1,21 @@
-import {
-  loadConfig,
-  getWallet,
-  storeDeployedAddresses,
-  getChain,
-  loadDeployedAddresses,
-} from "./utils";
-import { relayer, ChainName } from "@certusone/wormhole-sdk";
+import { Chain, Wormhole, api } from "@wormhole-foundation/connect-sdk";
+import { EvmPlatform } from "@wormhole-foundation/connect-sdk-evm";
 
 export async function getStatus(
-  sourceChain: ChainName,
-  transactionHash: string
+  sourceChain: Chain,
+  txid: string
 ): Promise<{ status: string; info: string }> {
-  const info = await relayer.getWormholeRelayerInfo(
-    sourceChain,
-    transactionHash,
-    { environment: "TESTNET" }
-  );
-  const status =
-    info.targetChainStatus.events[0]?.status || DeliveryStatus.PendingDelivery;
-  return { status, info: info.stringified || "Info not obtained" };
+  const wh = new Wormhole("Testnet", [EvmPlatform]);
+  const ctx = wh.getChain(sourceChain);
+  const [msgid] = await ctx.parseTransaction(txid);
+
+  const info = await wh.getTransactionStatus(msgid!);
+  const status = info?.globalTx?.originTx.status || "Pending";
+  return { status, info: JSON.stringify(info) || "Info not obtained" };
 }
 
-export const DeliveryStatus = relayer.DeliveryStatus;
-
 export const waitForDelivery = async (
-  sourceChain: ChainName,
+  sourceChain: Chain,
   transactionHash: string
 ) => {
   let pastStatusString = "";
@@ -42,7 +33,7 @@ export const waitForDelivery = async (
       console.log(res.info);
       pastStatusString = res.info;
     }
-    if (res.status !== DeliveryStatus.PendingDelivery) break;
+    if (res.status !== "Pending") break;
     console.log(`\nContinuing to wait for delivery\n`);
   }
 };

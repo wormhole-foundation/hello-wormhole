@@ -1,11 +1,13 @@
 import { describe, expect, test } from "@jest/globals";
+import { toChain } from "@wormhole-foundation/connect-sdk";
 import { ethers } from "ethers";
-import { getHelloWormhole, getWallet, getDeliveryHash, sleep } from "./utils";
-import { CHAIN_ID_TO_NAME } from "@certusone/wormhole-sdk";
 import { waitForDelivery } from "./getStatus";
+import { getHelloWormhole } from "./utils";
 
 const sourceChain = 6;
 const targetChain = 14;
+
+import "@wormhole-foundation/connect-sdk-evm-core";
 
 describe("Hello Wormhole Integration Tests on Testnet", () => {
   test(
@@ -19,22 +21,20 @@ describe("Hello Wormhole Integration Tests on Testnet", () => {
         targetChain
       );
       console.log(
-        `Cost of sending the greeting: ${ethers.utils.formatEther(
-          cost
-        )} testnet AVAX`
+        `Cost of sending the greeting: ${ethers.formatEther(cost)} testnet AVAX`
       );
 
       console.log(`Sending greeting: ${arbitraryGreeting}`);
       const tx = await sourceHelloWormholeContract.sendCrossChainGreeting(
         targetChain,
-        targetHelloWormholeContract.address,
+        await targetHelloWormholeContract.getAddress(),
         arbitraryGreeting,
         { value: cost }
       );
       console.log(`Transaction hash: ${tx.hash}`);
       const rx = await tx.wait();
 
-      await waitForDelivery(CHAIN_ID_TO_NAME[sourceChain], tx.hash);
+      await waitForDelivery(toChain(sourceChain), tx.hash);
 
       console.log(`Reading greeting`);
       const readGreeting = await targetHelloWormholeContract.latestGreeting();

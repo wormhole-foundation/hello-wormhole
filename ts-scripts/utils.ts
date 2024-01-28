@@ -3,6 +3,47 @@ import { readFileSync, writeFileSync } from "fs";
 
 import { HelloWormhole, HelloWormhole__factory } from "./ethers-contracts";
 
+import {
+  EvmNativeSigner,
+  EvmPlatform,
+  getEvmSignerForKey,
+} from "@wormhole-foundation/connect-sdk-evm";
+import {
+  Chain,
+  CONFIG,
+  Network,
+  Signer,
+  toChain,
+  Wormhole,
+} from "@wormhole-foundation/connect-sdk";
+
+// read in from `.env`
+require("dotenv").config();
+
+function getEnv(key: string): string {
+  // If we're in the browser, return empty string
+  if (typeof process === undefined) return "";
+  // Otherwise, return the env var or error
+  const val = process.env[key];
+  if (!val)
+    throw new Error(
+      `Missing env var ${key}, did you forget to set valies in '.env'?`
+    );
+  return val;
+}
+
+export async function getSigner<N extends Network, C extends Chain>(
+  network: N,
+  chain: C
+): Promise<Signer> {
+  const wh = new Wormhole(network, [EvmPlatform]);
+  const ctx = wh.getChain(chain);
+  return await getEvmSignerForKey(
+    await ctx.getRpc(),
+    getEnv("ETH_PRIVATE_KEY")
+  );
+}
+
 export interface ChainInfo {
   description: string;
   chainId: number;
@@ -28,17 +69,25 @@ export function getHelloWormhole(chainId: number): HelloWormhole {
   return HelloWormhole__factory.connect(deployed, getWallet(chainId));
 }
 
-export function getChain(chainId: number): ChainInfo {
-  const chain = loadConfig().chains.find((c) => c.chainId === chainId)!;
-  if (!chain) {
-    throw new Error(`Chain ${chainId} not found`);
-  }
-  return chain;
+export function getChain(network: Network, chainId: number): ChainInfo {
+  const chain = toChain(chainId);
+
+  const conf = CONFIG[network].chains[chain]!;
+  const info: ChainInfo = {
+    description: `${network}:${chain}`,
+    chainId,
+    rpc: conf.rpc,
+    tokenBridge: conf.contracts.tokenBridge!,
+    wormholeRelayer: conf.contracts.relayer!,
+    wormhole: conf.contracts.coreBridge!,
+  };
+
+  return info;
 }
 
 export function getWallet(chainId: number): Wallet {
   const rpc = loadConfig().chains.find((c) => c.chainId === chainId)?.rpc;
-  let provider = new ethers.providers.JsonRpcProvider(rpc);
+  let provider = new ethers.JsonRpcProvider(rpc);
   if (!process.env.EVM_PRIVATE_KEY)
     throw Error(
       "No private key provided (use the EVM_PRIVATE_KEY environment variable)"
@@ -138,66 +187,5 @@ export function getArg(
 export const deployed = (x: any) => x.deployed();
 export const wait = (x: any) => x.wait();
 
-import {
-  CONTRACTS,
-  relayer,
-  ethers_contracts,
-  tryNativeToHexString,
-  ChainName,
-  Network,
-  CHAINS,
-} from "@certusone/wormhole-sdk";
-
-export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// Temporarily here - will move to the typescript SDK soon so it can be directly imported from there!
-export async function getDeliveryHash(
-  rx: ethers.ContractReceipt,
-  sourceChain: ChainName,
-  optionalParams?: {
-    network?: Network;
-    provider?: ethers.providers.Provider;
-  }
-): Promise<string> {
-  const network: Network = optionalParams?.network || "MAINNET";
-  const provider: ethers.providers.Provider =
-    optionalParams?.provider ||
-    relayer.getDefaultProvider(network, sourceChain);
-  const wormholeAddress = CONTRACTS[network][sourceChain].core;
-  if (!wormholeAddress) {
-    throw Error(`No wormhole contract on ${sourceChain} for ${network}`);
-  }
-  const wormholeRelayerAddress =
-    relayer.RELAYER_CONTRACTS[network][sourceChain]?.wormholeRelayerAddress;
-  if (!wormholeRelayerAddress) {
-    throw Error(
-      `No wormhole relayer contract on ${sourceChain} for ${network}`
-    );
-  }
-  const log = rx.logs.find(
-    (log) =>
-      log.address.toLowerCase() === wormholeAddress.toLowerCase() &&
-      log.topics[1].toLowerCase() ===
-        "0x" +
-          tryNativeToHexString(wormholeRelayerAddress, "ethereum").toLowerCase()
-  );
-  if (!log) throw Error("No wormhole relayer log found");
-  const wormholePublishedMessage =
-    ethers_contracts.Implementation__factory.createInterface().parseLog(log);
-  const block = await provider.getBlock(rx.blockHash);
-  const body = ethers.utils.solidityPack(
-    ["uint32", "uint32", "uint16", "bytes32", "uint64", "uint8", "bytes"],
-
-    [
-      block.timestamp,
-      wormholePublishedMessage.args["nonce"],
-      CHAINS[sourceChain],
-      log.topics[1],
-      wormholePublishedMessage.args["sequence"],
-      wormholePublishedMessage.args["consistencyLevel"],
-      wormholePublishedMessage.args["payload"],
-    ]
-  );
-  const deliveryHash = ethers.utils.keccak256(ethers.utils.keccak256(body));
-  return deliveryHash;
-}
+export const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
