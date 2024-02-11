@@ -24,8 +24,12 @@ contract HelloWormholeConfirmation is Base, IWormholeReceiver {
 
     constructor(
         address _wormholeRelayer,
-        address _wormhole
-    ) Base(_wormholeRelayer, _wormhole) {}
+        address _wormhole,
+        uint16 _chainId
+    ) Base(_wormholeRelayer, _wormhole) {
+        chainId = _chainId;
+    }
+    
 
     function quoteCrossChainGreeting(
         uint16 targetChain,
@@ -44,26 +48,33 @@ contract HelloWormholeConfirmation is Base, IWormholeReceiver {
         uint16 targetChain,
         address targetAddress,
         string memory greeting,
-        uint256 receiverValueForSecondDeliveryPayment
+        uint256 receiverValueForSecondDeliveryPayment,
+        uint16 refundChain,
+        address refundAddress
     ) public payable {
         uint256 cost = quoteCrossChainGreeting(
             targetChain,
             receiverValueForSecondDeliveryPayment
         );
-        require(msg.value == cost);
-
+        require(msg.value == cost, "Incorrect amount sent");
+    
+        // Additional check to ensure targetAddress is a valid Ethereum address
+        require(targetAddress != address(0), "Invalid target address");
+    
+        // Ensure refundAddress is a valid Ethereum address
+        require(refundAddress != address(0), "Invalid refund address");
+    
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             targetChain,
             targetAddress,
             abi.encode(MessageType.GREETING, greeting, msg.sender), // payload
             receiverValueForSecondDeliveryPayment, // will be used to pay for the confirmation
             SENDING_GAS_LIMIT,
-            // we add a refund chain and address as the requester of the cross chain greeting
-            chainId,
-            msg.sender
+            refundChain,
+            refundAddress
         );
     }
-
+    
     function quoteConfirmation(
         uint16 targetChain
     ) public view returns (uint256 cost) {
