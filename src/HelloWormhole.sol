@@ -6,12 +6,19 @@ import "wormhole-solidity-sdk/interfaces/IWormholeReceiver.sol";
 
 contract HelloWormhole is IWormholeReceiver {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
+    event EtherReceived(address indexed sender, uint256 amount);
+    event ReceivedNonZeroEther(address indexed sender, uint256 amount);
 
     uint256 constant GAS_LIMIT = 50_000;
 
     IWormholeRelayer public immutable wormholeRelayer;
 
     string public latestGreeting;
+
+    modifier onlyWormholeRelayer() {
+        require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
+        _;
+    }
 
     constructor(address _wormholeRelayer) {
         wormholeRelayer = IWormholeRelayer(_wormholeRelayer);
@@ -33,7 +40,7 @@ contract HelloWormhole is IWormholeReceiver {
         string memory greeting
     ) public payable {
         uint256 cost = quoteCrossChainGreeting(targetChain);
-        require(msg.value == cost);
+        require(msg.value == cost, "Incorrect amount sent");
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             targetChain,
             targetAddress,
@@ -49,9 +56,7 @@ contract HelloWormhole is IWormholeReceiver {
         bytes32, // address that called 'sendPayloadToEvm' (HelloWormhole contract address)
         uint16 sourceChain,
         bytes32 // unique identifier of delivery
-    ) public payable override {
-        require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
-
+    ) public payable override onlyWormholeRelayer {
         // Parse the payload and do the corresponding actions!
         (string memory greeting, address sender) = abi.decode(
             payload,
@@ -59,5 +64,20 @@ contract HelloWormhole is IWormholeReceiver {
         );
         latestGreeting = greeting;
         emit GreetingReceived(latestGreeting, sourceChain, sender);
+    }
+
+    // Fallback function to handle unexpected Ether transfers
+    receive() external payable {
+        // Handle unexpected Ether transfers (if necessary)
+        emit EtherReceived(msg.sender, msg.value);
+
+        // Perform additional logic based on the received amount
+        if (msg.value > 0) {
+            // Perform some action or trigger an event based on the received amount
+            emit ReceivedNonZeroEther(msg.sender, msg.value);
+        } else {
+            // Reject the transfer if the received amount is zero
+            revert("Received zero Ether");
+        }
     }
 }

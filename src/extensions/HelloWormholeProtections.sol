@@ -7,8 +7,12 @@ import "wormhole-solidity-sdk/WormholeRelayerSDK.sol";
 
 contract HelloWormholeProtections is Base, IWormholeReceiver {
     event GreetingReceived(string greeting, uint16 senderChain, address sender);
+    event RelayerUpdated(address newRelayer);
+    event GreetingSet(string newGreeting);
+
 
     uint256 constant GAS_LIMIT = 50_000;
+    address owner = msg.sender;
 
     string public latestGreeting;
 
@@ -16,6 +20,11 @@ contract HelloWormholeProtections is Base, IWormholeReceiver {
         address _wormholeRelayer,
         address _wormhole
     ) Base(_wormholeRelayer, _wormhole) {}
+
+    modifier onlyOwner {
+        require(msg.sender == owner, "Not the owner");
+        _;
+    }
 
     function quoteCrossChainGreeting(
         uint16 targetChain
@@ -37,8 +46,8 @@ contract HelloWormholeProtections is Base, IWormholeReceiver {
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             targetChain,
             targetAddress,
-            abi.encode(greeting, msg.sender), // payload
-            0, // no receiver value needed since we're just passing a message
+            abi.encode(greeting, msg.sender),
+            0,
             GAS_LIMIT
         );
     }
@@ -63,5 +72,16 @@ contract HelloWormholeProtections is Base, IWormholeReceiver {
         latestGreeting = greeting;
 
         emit GreetingReceived(latestGreeting, sourceChain, sender);
+    }
+
+    // Function to get the current balance of the contract
+    function getContractBalance() public view onlyOwner returns (uint256) {
+        return address(this).balance;
+    }
+
+     // Function to set a new greeting message
+     function setGreeting(string memory newGreeting) public onlyOwner {
+        latestGreeting = newGreeting;
+        emit GreetingSet(newGreeting);
     }
 }
