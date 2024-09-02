@@ -6,6 +6,28 @@ Specifically, we will write and deploy a contract onto many chains that allows u
 
 This also allows users to pay for their custom greeting to be emitted on a chain that they do not have any gas funds for!
 
+### Understanding the Workflow
+
+In cross-chain applications, messages are passed between chains using 
+Wormhole's infrastructure. The functions you will implement here, 
+such as `sendCrossChainGreeting`, play a crucial role in this process 
+by ensuring that messages are properly formatted, sent, and received 
+across different blockchain environments.
+
+### Visual Guide
+
+The following diagram illustrates the typical workflow:
+
+1. **Message Emission**: A message is emitted on the source chain (e.g., Ethereum).
+2. **VAA Creation**: The message is observed by the Guardian Network, 
+   which creates a Verifiable Action Approval (VAA).
+3. **Relaying the VAA**: The VAA is then relayed by a relayer 
+   (either standard or specialized) to the target chain (e.g., Avalanche).
+4. **Message Processing**: The target chain processes the VAA and 
+   performs the intended action, such as emitting an event.
+
+Understanding this process will help you follow the code implementation more effectively.
+
 ## Getting Started
 
 Included in the [repository](https://github.com/wormhole-foundation/hello-wormhole) is:
@@ -161,6 +183,90 @@ In exchange for calling your contract at `targetAddress` on `targetChain` and pa
 ```
 (deliveryPrice,) = quoteEVMDeliveryPrice(targetChain, receiverValue, gasLimit)
 ```
+
+### Handling Edge Cases
+
+While the basic functions work for standard scenarios, it's important 
+to account for edge cases that might occur during cross-chain messaging. 
+Below are additional examples to consider:
+
+#### Message Delivery Failures
+
+In some cases, the message may fail to be delivered to the target chain 
+due to network issues or other unforeseen circumstances. Implement error handling 
+in your `sendCrossChainGreeting` function to catch and retry or log these failures:
+
+```solidity
+function sendCrossChainGreeting(
+        uint16 targetChain,
+        address targetHelloWormhole,
+        string memory greeting
+) public payable {
+    bytes memory payload = abi.encode(greeting, msg.sender);
+    uint256 cost = quoteCrossChainGreeting(targetChain);
+    require(msg.value == cost, "Incorrect payment");
+
+    try wormholeRelayer.sendPayloadToEvm{value: cost}(
+            targetChain,
+            targetHelloWormhole,
+            payload,
+            0, // receiver value
+            GAS_LIMIT
+    ) {
+        // Successful delivery logic here
+    } catch {
+        // Handle failure (e.g., log the issue, retry, or revert)
+    }
+}
+
+**Handling Different Payload Sizes**
+Cross-chain messages may vary in size, and larger payloads can lead to higher costs or failures if they exceed certain limits. Here's how to handle varying payload sizes:
+function sendCustomCrossChainGreeting(
+        uint16 targetChain,
+        address targetHelloWormhole,
+        string memory greeting
+) public payable {
+    bytes memory payload = abi.encode(greeting, msg.sender);
+    uint256 payloadSize = payload.length;
+
+    // Adjust gas limit or fees based on payload size
+    uint256 adjustedGasLimit = GAS_LIMIT + (payloadSize / 100);  // Example adjustment
+    uint256 cost = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, 0, adjustedGasLimit);
+    
+    require(msg.value >= cost, "Insufficient payment for message size");
+
+    wormholeRelayer.sendPayloadToEvm{value: cost}(
+        targetChain,
+        targetHelloWormhole,
+        payload,
+        0, 
+        adjustedGasLimit
+    );
+}
+
+**Real-World Use Cases**
+Consider a scenario where you need to send multiple types of data in a single cross-chain message, such as a greeting along with some metadata. Implement the following logic to manage such cases:
+function sendComplexCrossChainGreeting(
+        uint16 targetChain,
+        address targetHelloWormhole,
+        string memory greeting,
+        bytes memory metadata
+) public payable {
+    bytes memory payload = abi.encode(greeting, msg.sender, metadata);
+    uint256 payloadSize = payload.length;
+    uint256 cost = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, 0, GAS_LIMIT + (payloadSize / 100));
+
+    require(msg.value == cost, "Incorrect payment");
+
+    wormholeRelayer.sendPayloadToEvm{value: cost}(
+        targetChain,
+        targetHelloWormhole,
+        payload,
+        0,
+        GAS_LIMIT + (payloadSize / 100)
+    );
+}
+
 
 So, following this interface, we can implement `sendCrossChainGreeting` by simply calling sendPayloadToEvm with the payload being some information we'd like to send, such as the greeting and the sender of the greeting.
 
